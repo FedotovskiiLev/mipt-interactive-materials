@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const BUILD='0.8';
+const BUILD='0.9';
 const KEY_SOURCE='mipt.bs.source';
 const KEY_SECTION='mipt.bs.section';
 const KEY_PINS='mipt.bs.pins';
@@ -21,8 +21,6 @@ const folderTree=$('folderTree'),breadcrumbs=$('breadcrumbs'),catalogContent=$('
 const sectionDialog=$('sectionDialog'),sectionChoices=$('sectionChoices'),closeSectionDialog=$('closeSectionDialog');
 const settingsDialog=$('settingsDialog'),closeSettings=$('closeSettings'),settingsSource=$('settingsSource'),settingsSection=$('settingsSection'),settingsChangeSection=$('settingsChangeSection'),forgetSourceBtn=$('forgetSourceBtn');
 
-const readerDialog=$('readerDialog'),readerFrame=$('readerFrame'),readerStatus=$('readerStatus'),readerMessage=$('readerMessage'),openDocviewer=$('openDocviewer'),openYandex=$('openYandex'),closeReader=$('closeReader');
-
 let source='';
 let rootEntries=[];
 let selectedSection='';
@@ -32,7 +30,6 @@ let metadata=[];
 let currentFolder='';
 let scanController=null;
 let manageMode=false;
-let readerTimer=null;
 
 const BOOK_EXT=new Set(['pdf','djvu','epub']);
 
@@ -364,11 +361,17 @@ connectForm.addEventListener('submit',async e=>{
   setupError.hidden=true;try{await connect(v)}catch(err){setupError.textContent=err.message;setupError.hidden=false;library.hidden=true;setup.hidden=false}
 });
 
-/* Reader: Yandex Docviewer.
-   Важная идея: браузер НЕ fetch()'ит PDF с storage.yandex.net, поэтому CORS больше не мешает.
-   Временный download URL передаём сервису docviewer.yandex.ru. */
+/* Чтение книг.
+   Яндекс Документы запрещает отображение внутри iframe другого сайта.
+   Поэтому на полностью статическом GitHub Pages корректный вариант —
+   сразу открыть Яндекс Просмотр документов в новой вкладке.
+
+   Вкладка создаётся синхронно по клику, чтобы браузер не блокировал её как popup.
+   Пока API выдаёт временную ссылку, в ней показывается короткий экран загрузки.
+*/
 function yandexFileUrl(book){
-  const base=source.replace(/\/$/,'');return `${base}/${parts(book.path).map(encodeURIComponent).join('/')}`
+  const base=source.replace(/\/$/,'');
+  return `${base}/${parts(book.path).map(encodeURIComponent).join('/')}`
 }
 function buildDocviewerUrl(href,book){
   const u=new URL('https://docviewer.yandex.ru/');
@@ -377,28 +380,54 @@ function buildDocviewerUrl(href,book){
   u.searchParams.set('lang','ru');
   return u.toString()
 }
+function writeOpeningPage(win,book){
+  try{
+    win.document.open();
+    win.document.write(`<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Открываем ${esc(book.title)}</title>
+<style>
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f4f6f8;color:#17202a;font:16px system-ui,-apple-system,"Segoe UI",sans-serif}
+main{text-align:center;max-width:540px;padding:32px}
+.spinner{width:34px;height:34px;margin:0 auto 18px;border:3px solid #d7dee5;border-top-color:#315f9a;border-radius:50%;animation:s .8s linear infinite}
+@keyframes s{to{transform:rotate(360deg)}}
+h1{font-size:1.1rem;margin:0 0 8px}
+p{color:#687582;line-height:1.5}
+</style>
+</head>
+<body>
+<main>
+<div class="spinner"></div>
+<h1>${esc(book.title)}</h1>
+<p>Открываем документ в просмотрщике Яндекса…</p>
+</main>
+</body>
+</html>`);
+    win.document.close();
+  }catch(_){}
+}
 async function openBook(book){
-  openYandex.href=yandexFileUrl(book);openDocviewer.hidden=true;openDocviewer.removeAttribute('href');
-  $('readerSubject').textContent=book.subject;$('readerTitle').textContent=book.volume?`${book.title} — ${book.volume}`:book.title;$('readerAuthor').textContent=book.author||book.name;
-  readerFrame.src='about:blank';readerMessage.hidden=false;readerStatus.textContent='Получаем ссылку на документ…';
-  readerDialog.showModal();
+  const fallback=yandexFileUrl(book);
+  const win=window.open('about:blank','_blank');
+
+  if(!win){
+    window.open(fallback,'_blank','noopener');
+    return;
+  }
+
+  writeOpeningPage(win,book);
+
   try{
     const d=await api({public_key:source,path:book.path},null,'/download');
-    if(!d.href)throw new Error('Яндекс не вернул ссылку на файл.');
-    const viewer=buildDocviewerUrl(d.href,book);
-    openDocviewer.href=viewer;openDocviewer.hidden=false;
-    readerStatus.textContent='Открываем через Яндекс Просмотр документов.';
-    readerFrame.src=viewer;
-    clearTimeout(readerTimer);
-    readerTimer=setTimeout(()=>{if(readerDialog.open)readerMessage.hidden=true},1400)
+    if(!d.href)throw new Error('Яндекс не вернул ссылку на документ.');
+    win.location.replace(buildDocviewerUrl(d.href,book));
   }catch(e){
-    readerStatus.textContent='Не удалось запустить просмотрщик.';
-    readerMessage.querySelector('strong').textContent='Документ не открылся';
-    readerMessage.querySelector('span').textContent=`${e.message} Можно открыть публичную страницу файла.`
+    try{win.location.replace(fallback)}
+    catch(_){window.open(fallback,'_blank','noopener')}
   }
 }
-closeReader.addEventListener('click',()=>{clearTimeout(readerTimer);readerFrame.src='about:blank';readerDialog.close()});
-readerDialog.addEventListener('close',()=>{clearTimeout(readerTimer);readerFrame.src='about:blank'});
 
 (async function init(){
   metadata=await loadMetadata();

@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Личная книжная полка и каталог учебников поверх публичной папки Яндекс Диска.">
   <title>Библиотека — Интерактивные материалы МФТИ</title>
-  <link rel="stylesheet" href="../assets/site.css?v=0.8">
-  <link rel="stylesheet" href="bookshelf.css?v=0.8">
+  <link rel="stylesheet" href="../assets/site.css?v=0.9">
+  <link rel="stylesheet" href="bookshelf.css?v=0.9">
 </head>
 <body>
 <header class="site-header">
@@ -59,7 +59,7 @@
         <span class="muted-dot">·</span>
         <span id="catalogStats">каталог ещё не загружен</span>
         <span class="muted-dot">·</span>
-        <span>0.8</span>
+        <span>0.9</span>
       </div>
       <button class="link-button" id="librarySettingsBtn" type="button">Настроить источник</button>
     </div>
@@ -145,34 +145,7 @@
   </div>
 </dialog>
 
-<dialog id="readerDialog" class="reader-dialog">
-  <div class="reader-shell">
-    <header class="reader-header">
-      <div class="reader-book">
-        <div class="reader-kicker" id="readerSubject"></div>
-        <div class="reader-title" id="readerTitle">—</div>
-        <div class="reader-author" id="readerAuthor"></div>
-      </div>
-      <div class="reader-actions">
-        <a class="btn" id="openDocviewer" target="_blank" rel="noopener" hidden>Открыть отдельно</a>
-        <a class="btn" id="openYandex" target="_blank" rel="noopener">Страница файла</a>
-        <button class="dialog-close" id="closeReader" type="button" aria-label="Закрыть">×</button>
-      </div>
-    </header>
 
-    <div class="reader-status" id="readerStatus">Подготавливаем просмотр…</div>
-
-    <div class="reader-frame-wrap">
-      <iframe id="readerFrame" title="Просмотр книги" allow="fullscreen"></iframe>
-      <div id="readerMessage" class="reader-message">
-        <div class="loader"></div>
-        <strong>Открываем документ</strong>
-        <span>Используем просмотрщик Яндекса напрямую, без промежуточной публичной страницы файла.</span>
-      </div>
-    </div>
-  </div>
-</dialog>
-
-<script src="bookshelf.js?v=0.8"></script>
+<script src="bookshelf.js?v=0.9"></script>
 </body>
 </html>
