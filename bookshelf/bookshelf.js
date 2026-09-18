@@ -5,7 +5,10 @@
   const VIEW_KEY = 'mipt.bookshelf.view.v1';
   const CACHE_KEY = 'mipt.bookshelf.cache.v2';
 
-  const API = 'https://cloud-api.yandex.net/v1/disk/public/resources';
+  const API_ENDPOINTS = [
+    'https://cloud-api.yandex.net/v1/disk/public/resources',
+    'https://cloud-api.yandex.ru/v1/disk/public/resources'
+  ];
   const BOOK_EXTENSIONS = new Set(['pdf', 'djvu', 'epub']);
 
   // Большая библиотека может содержать сотни папок. Сканируем несколько
@@ -197,33 +200,47 @@
   }
 
   async function apiGet(params, signal) {
-    const url = new URL(API);
+    let lastError = null;
 
-    for (const [key, value] of Object.entries(params)) {
-      if (value !== undefined && value !== null && value !== '') {
-        url.searchParams.set(key, String(value));
-      }
-    }
-
-    const response = await fetchWithTimeout(url, signal);
-
-    if (!response.ok) {
-      let detail = '';
+    for (const endpoint of API_ENDPOINTS) {
       try {
-        const payload = await response.json();
-        detail = payload.message || payload.description || '';
-      } catch (_) {}
+        const url = new URL(endpoint);
 
-      if (response.status === 429) {
-        throw new Error('Яндекс Диск временно ограничил число запросов. Подождите немного и нажмите «Обновить».');
+        for (const [key, value] of Object.entries(params)) {
+          if (value !== undefined && value !== null && value !== '') {
+            url.searchParams.set(key, String(value));
+          }
+        }
+
+        // Не добавляем пользовательские заголовки: запрос остаётся максимально
+        // простым для браузера и меньше зависит от CORS-настроек провайдера.
+        const response = await fetchWithTimeout(url, signal);
+
+        if (!response.ok) {
+          let detail = '';
+          let code = '';
+          try {
+            const payload = await response.json();
+            detail = payload.message || payload.description || '';
+            code = payload.error || '';
+          } catch (_) {}
+
+          const e = new Error(
+            `HTTP ${response.status}${code ? ` · ${code}` : ''}${detail ? ` · ${detail}` : ''}`
+          );
+          e.httpStatus = response.status;
+          e.endpoint = endpoint;
+          throw e;
+        }
+
+        return await response.json();
+      } catch (error) {
+        if (error.name === 'AbortError') throw error;
+        lastError = error;
       }
-
-      throw new Error(
-        `Яндекс Диск вернул ошибку ${response.status}${detail ? `: ${detail}` : ''}.`
-      );
     }
 
-    return response.json();
+    throw lastError || new Error('Не удалось обратиться к API Яндекс Диска.');
   }
 
   async function readDirectory(publicKey, task, signal) {
@@ -376,6 +393,15 @@
             return await readDirectory(source, task, controller.signal);
           } catch (error) {
             if (error.name === 'AbortError') throw error;
+
+            // Если не читается корень публичной папки, дальше сканировать нечего.
+            // Показываем настоящую ошибку, а не вводящее в заблуждение
+            // "некоторые папки прочитать не удалось".
+            if (!task.path) {
+              error.isRootFailure = true;
+              throw error;
+            }
+
             failures += 1;
             return { files: [], directories: [], error };
           }
@@ -435,11 +461,32 @@
       box.className = 'error';
 
       if (error instanceof TypeError) {
-        box.textContent =
-          'Браузер не смог выполнить запрос к API Яндекс Диска. Проверьте интернет и откройте сайт по HTTPS. Если проблема повторяется — нажмите «Обновить».';
+        box.innerHTML =
+          '<strong>Корень публичной папки не удалось прочитать из браузера.</strong> ' +
+          'Это похоже на сетевое/CORS-ограничение между GitHub Pages и API Яндекс Диска, ' +
+          'а не на отсутствие книг. Ссылка сохранена только в этом браузере.';
       } else {
-        box.textContent = `${error.message} Ссылка сохранена только в этом браузере; её можно не вводить заново.`;
+        const rootPrefix = error.isRootFailure
+          ? '<strong>Яндекс Диск не дал прочитать корень этой публичной папки.</strong> '
+          : '';
+        box.innerHTML = rootPrefix + escapeHtml(error.message) +
+          ' Ссылка сохранена только в этом браузере; её можно не вводить заново.';
       }
+
+      const details = document.createElement('details');
+      details.className = 'diagnostics';
+      const summary = document.createElement('summary');
+      summary.textContent = 'Технические сведения';
+      const pre = document.createElement('pre');
+      pre.textContent = [
+        `Источник: ${source}`,
+        `Тип ошибки: ${error.name || 'Error'}`,
+        `Сообщение: ${error.message || 'нет сообщения'}`,
+        `Страница: ${location.href}`,
+        `Онлайн: ${navigator.onLine ? 'да' : 'нет'}`
+      ].join('\n');
+      details.append(summary, pre);
+      box.append(details);
 
       catalog.prepend(box);
     } finally {
@@ -499,6 +546,15 @@
       .split(' ')
       .filter(Boolean)
       .every(part => text.includes(part));
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
   function render() {
