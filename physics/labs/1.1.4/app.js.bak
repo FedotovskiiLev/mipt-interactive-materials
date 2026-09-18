@@ -523,46 +523,19 @@
   let programShown=[];
   let programCursor=0;
   let programTimer=null;
-  let programPlaybackState='idle';
 
   function poissonRandom(mu){
     const L=Math.exp(-mu);let k=0,p=1;
     do{k++;p*=Math.random()}while(p>L);
     return k-1;
   }
-  function stopProgram(){
-    if(programTimer){clearInterval(programTimer);programTimer=null}
-  }
-  function updateProgramPlaybackButtons(){
-    const start=$('progStart'),pause=$('progPause');
-    if(!start||!pause)return;
-    if(programPlaybackState==='paused'){
-      start.textContent='Продолжить';
-      pause.disabled=true;
-    }else if(programPlaybackState==='running'){
-      start.textContent='Идёт…';
-      pause.disabled=false;
-    }else if(programPlaybackState==='finished'){
-      start.textContent='Сначала';
-      pause.disabled=true;
-    }else{
-      start.textContent='Старт';
-      pause.disabled=true;
-    }
-  }
-  function pauseProgram(){
-    if(programPlaybackState!=='running')return;
-    stopProgram();
-    programPlaybackState='paused';
-    $('progDataInfo').textContent=`Пауза: ${programCursor} из ${programData.length}. Нажмите «Продолжить».`;
-    updateProgramPlaybackButtons();
-  }
+  function stopProgram(){if(programTimer){clearInterval(programTimer);programTimer=null}}
   function setProgramMode(mode){
     programMode=mode;
     $$('#programModeButtons button').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
     $('programExperimentControls').hidden=mode!=='experiment';
     $('programSimulationControls').hidden=mode!=='simulation';
-    stopProgram();programShown=[];programCursor=0;programPlaybackState='idle';renderProgram();updateProgramPlaybackButtons();
+    stopProgram();programShown=[];programCursor=0;renderProgram();
     $('progDataInfo').textContent=mode==='experiment'?'Выберите запись эксперимента.':'Выберите распределение и источник серии.';
   }
   function setSimulationDistribution(kind){
@@ -578,61 +551,19 @@
     }catch(e){$('progDataInfo').textContent=`Не удалось загрузить пример: ${e.message}`}
   }
   function setProgramData(data,label,meta={}){
-    stopProgram();
-    programData=[...data];
-    programMeta={kind:'unknown',distribution:null,mu:null,start:null,stop:null,declaredCount:null,...meta};
-    programShown=[];
-    programCursor=0;
-    programPlaybackState='idle';
-    $('progDataInfo').textContent=`${label}: ${programData.length} значений.`;
-    renderProgram();
-    updateProgramPlaybackButtons();
+    stopProgram();programData=[...data];programMeta={kind:'unknown',distribution:null,mu:null,start:null,stop:null,declaredCount:null,...meta};programShown=[];programCursor=0;
+    $('progDataInfo').textContent=`${label}: ${programData.length} значений.`;renderProgram();
   }
-  function resetProgramPlayback(){
-    stopProgram();
-    programShown=[];
-    programCursor=0;
-    programPlaybackState='idle';
-    renderProgram();
-    updateProgramPlaybackButtons();
-    if(programData.length)$('progDataInfo').textContent=`Сброс: готово к запуску с начала (${programData.length} точек).`;
-  }
+  function resetProgramPlayback(){stopProgram();programShown=[];programCursor=0;renderProgram()}
   function startProgram(){
-    if(!programData.length){
-      $('progDataInfo').textContent='Сначала выберите или сгенерируйте серию.';
-      return;
-    }
-
-    // После завершения новый запуск начинается с начала.
-    // После паузы programCursor и programShown сохраняются, поэтому продолжаем с той же точки.
-    if(programPlaybackState==='finished' || programCursor>=programData.length){
-      programShown=[];
-      programCursor=0;
-    }
-
-    stopProgram();
-    programPlaybackState='running';
-    $('progDataInfo').textContent=`Воспроизведение: ${programCursor} из ${programData.length}.`;
-    updateProgramPlaybackButtons();
-
-    programTimer=setInterval(()=>{
+    if(!programData.length){$('progDataInfo').textContent='Сначала выберите или сгенерируйте серию.';return}
+    if(programCursor>=programData.length){programShown=[];programCursor=0}
+    stopProgram();programTimer=setInterval(()=>{
       const batch=Math.max(1,Number($('progSpeed').value)||1);
-      for(let i=0;i<batch&&programCursor<programData.length;i++){
-        programShown.push(programData[programCursor]);
-        programCursor++;
-      }
-      renderProgram();
-      if(programCursor>=programData.length){
-        stopProgram();
-        programPlaybackState='finished';
-        $('progDataInfo').textContent=`Готово: показаны все ${programData.length} точек.`;
-        updateProgramPlaybackButtons();
-      }else{
-        $('progDataInfo').textContent=`Воспроизведение: ${programCursor} из ${programData.length}.`;
-      }
+      for(let i=0;i<batch&&programCursor<programData.length;i++){programShown.push(programData[programCursor]);programCursor++}
+      renderProgram();if(programCursor>=programData.length)stopProgram();
     },120);
   }
-
   function renderProgram(){
     const s=programShown.length?stats(programShown,1):null;
     $('progLiveN').textContent=programShown.length;
@@ -695,11 +626,10 @@
   $('progLoadExpArchive').addEventListener('click',()=>loadProgramFile('examples/simulation-exp-2022.txt','Архивная симуляция exp 2022'));
   $('progLoadExperiment').addEventListener('click',()=>loadProgramFile($('progExperimentExample').value,'Запись эксперимента'));
   $('progUseAnalyzer').addEventListener('click',()=>{if(!rawData.length){$('progDataInfo').textContent='В анализаторе пока нет данных.';return}setProgramData(rawData,'Данные из анализатора',rawMeta)});
-  $('progStart').addEventListener('click',startProgram);$('progPause').addEventListener('click',pauseProgram);$('progReset').addEventListener('click',resetProgramPlayback);
+  $('progStart').addEventListener('click',startProgram);$('progPause').addEventListener('click',stopProgram);$('progReset').addEventListener('click',resetProgramPlayback);
   $('progToAnalyzer').addEventListener('click',()=>{if(!programData.length){$('progDataInfo').textContent='Нет серии для передачи.';return}dataText.value=serializeLabFile(programData,programMeta);rawData=[...programData];rawMeta={...programMeta,declaredCount:programData.length};updateAnalysis();document.querySelector('#analyzer').scrollIntoView({behavior:'smooth'})});
   $('progDownload').addEventListener('click',()=>{if(!programData.length){$('progDataInfo').textContent='Нет серии для сохранения.';return}const blob=new Blob([serializeLabFile(programData,programMeta)],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`lab-1.1.4-${programMeta.kind||'data'}-${programMeta.distribution||'series'}.txt`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
   setSimulationDistribution('poisson');
-  updateProgramPlaybackButtons();
 
   // ---------- 09. Журнал ----------
   const JOURNAL_KEY='mipt.lab114.journal.v1';

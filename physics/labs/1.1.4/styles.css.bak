@@ -145,6 +145,3 @@ main{max-width:1240px;margin:auto;padding:0 20px 80px}
 .data-file-meta{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.data-file-meta span{padding:6px 8px;border:1px solid #dfe5eb;border-radius:8px;background:#fafcfd;color:#66727e;font-size:.7rem}.data-file-meta b{color:#24313d}
 @media(max-width:1100px){.program-four-grid{grid-template-columns:1fr}.program-chart-card canvas{height:280px}}
 @media(max-width:760px){.program-evidence-note{grid-template-columns:1fr}.program-body-final{grid-template-columns:1fr}.program-two-buttons{grid-template-columns:1fr}.program-chart-card canvas{height:230px}.program-boundaries-final{grid-template-columns:1fr}}
-
-.program-resume-note{margin:8px 0 0;color:var(--muted);font-size:.72rem;line-height:1.4}
-.program-run-buttons .button:disabled{opacity:.48;cursor:not-allowed}
