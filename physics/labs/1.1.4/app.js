@@ -82,6 +82,11 @@
     return Math.exp(-.5 * ((x - mu) / sigma) ** 2) / (sigma * Math.sqrt(2 * Math.PI));
   }
 
+  // ---------- 00. Теория с нуля ----------
+  const theoryItems=$$('#theoryAccordion details');
+  $('openAllTheory').addEventListener('click',()=>theoryItems.forEach(d=>d.open=true));
+  $('closeAllTheory').addEventListener('click',()=>theoryItems.forEach(d=>d.open=false));
+
   // ---------- 01. Схема измерения ----------
   const PULSE_TIMES = [0.18,0.71,1.14,1.43,1.86,2.21,2.83,3.08,3.51,3.73,4.16,4.88,5.09,5.27,5.92,6.45,6.62,7.18,7.39,7.77];
   let measureTau = 1;
@@ -473,6 +478,176 @@
   [baseTauInput,tauInput,tauListInput].forEach(el=>el.addEventListener('change',()=>{if(rawData.length)updateAnalysis()}));
   $('sampleBtn').addEventListener('click',async()=>{try{const r=await fetch('sample_data.txt',{cache:'no-cache'});if(!r.ok)throw new Error();dataText.value=await r.text();rawData=parseData(dataText.value);updateAnalysis()}catch(_){$('dataStatus').textContent='Не удалось загрузить учебный пример.'}});
 
+  // ---------- 09. Учебная версия лабораторной программы ----------
+  let programMode='replay';
+  let programData=[];
+  let programShown=[];
+  let programCursor=0;
+  let programTimer=null;
+
+  function poissonRandom(mu){
+    const L=Math.exp(-mu);let k=0,p=1;
+    do{k++;p*=Math.random()}while(p>L);
+    return k-1;
+  }
+  function stopProgram(){
+    if(programTimer){clearInterval(programTimer);programTimer=null}
+  }
+  function setProgramMode(mode){
+    programMode=mode;
+    $$('#programModeButtons button').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
+    $('programReplayControls').hidden=mode!=='replay';
+    $('programPoissonControls').hidden=mode!=='poisson';
+    resetProgramPlayback(false);
+    $('progDataInfo').textContent=mode==='replay'
+      ? 'Выберите данные из анализатора или учебную серию.'
+      : 'Задайте n̄ и размер серии, затем сгенерируйте данные.';
+  }
+  function setProgramData(data,label){
+    stopProgram();
+    programData=[...data];
+    programShown=[];
+    programCursor=0;
+    $('progDataInfo').textContent=`${label}: ${programData.length} значений.`;
+    renderProgram();
+  }
+  function resetProgramPlayback(clearData=false){
+    stopProgram();
+    programShown=[];
+    programCursor=0;
+    if(clearData)programData=[];
+    renderProgram();
+  }
+  function startProgram(){
+    if(!programData.length){
+      $('progDataInfo').textContent='Сначала выберите или сгенерируйте серию.';
+      return;
+    }
+    if(programCursor>=programData.length){programShown=[];programCursor=0}
+    stopProgram();
+    programTimer=setInterval(()=>{
+      const batch=Math.max(1,Number($('progSpeed').value)||1);
+      for(let i=0;i<batch&&programCursor<programData.length;i++){
+        programShown.push(programData[programCursor]);
+        programCursor++;
+      }
+      renderProgram();
+      if(programCursor>=programData.length)stopProgram();
+    },120);
+  }
+  function renderProgram(){
+    const s=programShown.length?stats(programShown,1):null;
+    $('progLiveN').textContent=programShown.length;
+    $('progLiveCurrent').textContent=programShown.length?programShown.at(-1):'—';
+    $('progLiveMean').textContent=s?format(s.mean,3):'—';
+    $('progLiveSigma').textContent=s?format(s.sigma,3):'—';
+    $('progLiveSem').textContent=s?format(s.sem,4):'—';
+    $('progCursorLabel').textContent=`${programCursor} / ${programData.length}`;
+
+    const recent=$('progRecent');
+    recent.innerHTML='';
+    programShown.slice(-18).forEach(v=>{
+      const el=document.createElement('span');
+      el.textContent=v;
+      recent.append(el);
+    });
+
+    drawProgramHistogram();
+  }
+  function drawProgramHistogram(){
+    const canvas=$('programChart');
+    if(!canvas)return;
+    const {ctx,w,h}=canvasSetup(canvas),pad={l:48,r:18,t:16,b:38};
+    drawAxes(ctx,w,h,pad,'n','wₙ');
+    if(!programShown.length)return;
+
+    const map=histogramMap(programShown);
+    const keys=[...map.keys()].sort((a,b)=>a-b);
+    const min=Math.min(...keys),max=Math.max(...keys),vals=[];
+    const theoreticalMean=programMode==='poisson'
+      ? Number($('progPoissonMean').value)
+      : stats(programShown,1).mean;
+    let ymax=0;
+
+    for(let n=min;n<=max;n++){
+      const emp=(map.get(n)||0)/programShown.length;
+      const p=poissonPMF(n,theoreticalMean);
+      vals.push({n,emp,p});
+      ymax=Math.max(ymax,emp,p);
+    }
+
+    ymax=Math.max(ymax*1.16,.01);
+    const plotW=w-pad.l-pad.r,plotH=h-pad.t-pad.b,step=plotW/Math.max(1,vals.length);
+    const X=i=>pad.l+(i+.5)*step;
+    const Y=v=>h-pad.b-v/ymax*plotH;
+
+    vals.forEach((d,i)=>{
+      const bw=Math.max(3,step*.65),x=X(i)-bw/2,y=Y(d.emp);
+      ctx.fillStyle=COLORS.data2;
+      ctx.fillRect(x,y,bw,h-pad.b-y);
+    });
+
+    ctx.strokeStyle=COLORS.poisson;
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    vals.forEach((d,i)=>{
+      const x=X(i),y=Y(d.p);
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    });
+    ctx.stroke();
+
+    ctx.fillStyle=COLORS.muted;
+    ctx.font='10px system-ui';
+    ctx.textAlign='center';
+    const every=Math.max(1,Math.ceil(vals.length/12));
+    vals.forEach((d,i)=>{if(i%every===0)ctx.fillText(String(d.n),X(i),h-pad.b+15)});
+
+    $('progChartNote').textContent=programMode==='poisson'
+      ? `столбцы — выборка; линия — Пуассон при n̄ = ${format(theoreticalMean,1)}`
+      : 'столбцы — данные; линия — Пуассон со средним текущей серии';
+  }
+
+  $$('#programModeButtons button').forEach(btn=>btn.addEventListener('click',()=>setProgramMode(btn.dataset.mode)));
+  $('progPoissonMean').addEventListener('input',()=>{
+    $('progPoissonMeanValue').textContent=$('progPoissonMean').value;
+    if(programMode==='poisson'&&programShown.length)drawProgramHistogram();
+  });
+  $('progGenerate').addEventListener('click',()=>{
+    const mu=Number($('progPoissonMean').value);
+    const N=Number($('progPoissonN').value);
+    const data=Array.from({length:N},()=>poissonRandom(mu));
+    setProgramData(data,`Пуассон: n̄ = ${mu}`);
+  });
+  $('progUseAnalyzer').addEventListener('click',()=>{
+    if(!rawData.length){
+      $('progDataInfo').textContent='В анализаторе пока нет данных. Сначала загрузите файл в разделе «Ваши данные».';
+      return;
+    }
+    setProgramData(rawData,'Данные из анализатора');
+  });
+  $('progUseSample').addEventListener('click',async()=>{
+    try{
+      const r=await fetch('sample_data.txt',{cache:'no-cache'});
+      if(!r.ok)throw new Error();
+      setProgramData(parseData(await r.text()),'Учебная серия');
+    }catch(_){
+      $('progDataInfo').textContent='Не удалось загрузить учебную серию.';
+    }
+  });
+  $('progStart').addEventListener('click',startProgram);
+  $('progPause').addEventListener('click',stopProgram);
+  $('progReset').addEventListener('click',()=>resetProgramPlayback(false));
+  $('progToAnalyzer').addEventListener('click',()=>{
+    if(!programData.length){
+      $('progDataInfo').textContent='Нет серии для передачи.';
+      return;
+    }
+    dataText.value=programData.join('\n');
+    rawData=[...programData];
+    updateAnalysis();
+    document.querySelector('#analyzer').scrollIntoView({behavior:'smooth'});
+  });
+
   // ---------- 09. Журнал ----------
   const JOURNAL_KEY='mipt.lab114.journal.v1';
   function loadJournal(){let data={};try{data=JSON.parse(localStorage.getItem(JOURNAL_KEY)||'{}')}catch(_){};$$('[data-journal]').forEach(t=>{t.value=data[t.dataset.journal]||'';t.addEventListener('input',saveJournal)})}
@@ -481,18 +656,105 @@
 
   // ---------- 10. Самопроверка ----------
   const quizData=[
-    {q:'Что означает Nₙ на гистограмме?',o:['Среднее число событий','Сколько раз встретилось значение n','Число всех измерений'],a:1,e:'Nₙ — число измерений, в которых получилось конкретное значение n. Частота wₙ = Nₙ/N.'},
-    {q:'Если число измерений N увеличить в 4 раза, как меняется σ⟨n⟩ при том же σₙ?',o:['Уменьшится в 2 раза','Уменьшится в 4 раза','Не изменится'],a:0,e:'σ⟨n⟩ = σₙ/√N. Корень из 4 равен 2.'},
-    {q:'Какое соотношение проверяют для пуассоновского потока?',o:['σₙ ≈ ⟨n⟩','σₙ ≈ √⟨n⟩','σₙ ≈ 1/⟨n⟩'],a:1,e:'Ключевое свойство Пуассона в методичке: σ = √n̄; экспериментально сравнивают σₙ и √⟨n⟩.'},
-    {q:'Что происходит при переходе от τ = 1 с к большему τ?',o:['Соседние отсчёты суммируются','Отбрасываются все малые значения','Каждый nᵢ делится на τ'],a:0,e:'Группировка — это суммирование последовательных исходных отсчётов в более длинные интервалы.'},
-    {q:'Почему nΣ ≈ 10⁴ особенно заметно в этой работе?',o:['Это число точек в гистограмме','Оно даёт относительную пуассоновскую ошибку порядка 1%','При нём σₙ становится нулём'],a:1,e:'ε = 1/√nΣ. При nΣ = 10⁴ получаем 1/100 = 1%.'}
+    {q:'Что означает nᵢ?',o:['Число регистраций в i-м интервале','Общее число измерений','Среднее число регистраций'],a:0,e:'nᵢ — результат одного временного интервала: сколько регистраций попало именно в него.'},
+    {q:'Что означает N?',o:['Число разных значений n','Общее число измерений в серии','Число событий в одном интервале'],a:1,e:'N — количество измерений (интервалов) в серии.'},
+    {q:'Как вычисляется ⟨n⟩?',o:['Σnᵢ / N','Σnᵢ² / N','N / Σnᵢ'],a:0,e:'Среднее — сумма всех nᵢ, делённая на число измерений N.'},
+    {q:'Какой делитель используется в формуле дисперсии именно в этой методичке?',o:['N','N − 1','√N'],a:0,e:'На странице используется определение методички: σₙ² = (1/N)Σ(nᵢ−⟨n⟩)².'},
+    {q:'Что показывает σₙ?',o:['Разброс отдельных отсчётов около среднего','Точность таймера','Количество измерений'],a:0,e:'σₙ характеризует разброс отдельных значений nᵢ.'},
+    {q:'Что показывает σ⟨n⟩?',o:['Ошибка найденного среднего','Число столбцов гистограммы','Длительность интервала'],a:0,e:'σ⟨n⟩ — ошибка среднего: σₙ/√N.'},
+    {q:'Если N увеличить в 4 раза при том же σₙ, что произойдёт с σ⟨n⟩?',o:['Уменьшится в 2 раза','Уменьшится в 4 раза','Увеличится в 2 раза'],a:0,e:'В знаменателе стоит √N. Корень из 4 равен 2.'},
+    {q:'Что означает Nₙ на гистограмме?',o:['Сколько раз встретилось конкретное значение n','Среднее n','Количество всех событий'],a:0,e:'Nₙ — число измерений, где получилось именно выбранное n.'},
+    {q:'Как связаны Nₙ и экспериментальная частота wₙ?',o:['wₙ = Nₙ/N','wₙ = N/Nₙ','wₙ = Nₙ·N'],a:0,e:'Высота экспериментального столбца задаётся частотой wₙ = Nₙ/N.'},
+    {q:'Какое свойство закона Пуассона проверяется в работе?',o:['σ ≈ √n̄','σ ≈ n̄²','σ ≈ 1/n̄'],a:0,e:'Ключевое свойство: стандартное отклонение Пуассона равно √n̄. Экспериментально сравнивают σₙ и √⟨n⟩.'},
+    {q:'При каком среднем методичка указывает практически пригодное гауссово приближение Пуассона?',o:['n̄ ≳ 10','n̄ < 1','Только n̄ = 1000'],a:0,e:'В методичке указан ориентир n̄ ≳ 10.'},
+    {q:'Какая доля гауссового распределения находится примерно в пределах ±σ?',o:['68%','95%','99,7%'],a:0,e:'Ориентиры: ≈68% в ±σ, ≈95% в ±2σ, ≈99,7% в ±3σ.'},
+    {q:'Что означает перейти от τ₀ = 1 с к τ = 10 с?',o:['Сложить каждые 10 последовательных секундных отсчётов','Умножить каждый отсчёт на 10 без группировки','Оставить только каждый десятый отсчёт'],a:0,e:'Группировка — суммирование соседних исходных значений в более длинный временной интервал.'},
+    {q:'Почему при разных τ удобно сравнивать j, а не только ⟨n⟩?',o:['j = ⟨n⟩/τ учитывает длительность интервала','j всегда равно σₙ','j не зависит от данных'],a:0,e:'Среднее число событий растёт с длительностью интервала. Интенсивность j нормирует его на τ.'},
+    {q:'Как определяется средняя интенсивность?',o:['j = ⟨n⟩/τ','j = τ/⟨n⟩','j = ⟨n⟩·τ'],a:0,e:'По методичке j = ⟨n⟩/τ.'},
+    {q:'Как связана ошибка интенсивности с ошибкой среднего?',o:['σⱼ = σ⟨n⟩/τ','σⱼ = σ⟨n⟩·τ','σⱼ = τ/σ⟨n⟩'],a:0,e:'При делении среднего на τ его ошибка также делится на τ.'},
+    {q:'Что такое nΣ?',o:['Общее число зарегистрированных событий Σnᵢ','Число групп после укрупнения τ','Среднее значение'],a:0,e:'nΣ = Σnᵢ = ⟨n⟩N.'},
+    {q:'Как для пуассоновского процесса выражается относительная ошибка среднего через nΣ?',o:['1/√nΣ','1/nΣ','√nΣ'],a:0,e:'Методичка приводит ε⟨n⟩ = 1/√nΣ.'},
+    {q:'Сколько событий нужно примерно зарегистрировать для относительной ошибки порядка 1%?',o:['10⁴','10²','10⁸'],a:0,e:'1/√10⁴ = 1/100 = 1%.'},
+    {q:'Какие значения α методичка предлагает исследовать для Парето?',o:['2,0 и 1,0','10 и 20','0 и 100'],a:0,e:'В задании явно указаны α = 2,0 и α = 1,0.'},
+    {q:'Что делает анализатор со строками файла, начинающимися с #?',o:['Игнорирует как комментарии','Считает их нулевыми отсчётами','Прерывает обработку'],a:0,e:'Строки с # являются комментариями и не входят в числовую серию.'},
+    {q:'Что происходит с неполной последней группой при группировке на сайте?',o:['Она не используется','Она дополняется нулями','Она удваивается'],a:0,e:'Обработчик использует только полные группы.'}
   ];
-  function renderQuiz(){const q=$('quiz');q.innerHTML='';quizData.forEach((item,qi)=>{const card=document.createElement('div');card.className='quiz-item';const question=document.createElement('div');question.className='quiz-question';question.textContent=`${qi+1}. ${item.q}`;const options=document.createElement('div');options.className='quiz-options';const fb=document.createElement('div');fb.className='quiz-feedback';item.o.forEach((text,oi)=>{const b=document.createElement('button');b.type='button';b.textContent=text;b.addEventListener('click',()=>{[...options.children].forEach(x=>{x.disabled=true});b.classList.add(oi===item.a?'correct':'wrong');if(oi!==item.a)options.children[item.a].classList.add('correct');fb.textContent=item.e});options.append(b)});card.append(question,options,fb);q.append(card)})}
+
+  let quizSet=[],quizIndex=0,quizCorrect=0,quizAnswered=false,quizCountMode=10;
+
+  function shuffled(arr){
+    const a=[...arr];
+    for(let i=a.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+  function startQuiz(count=quizCountMode){
+    quizCountMode=count;
+    quizSet=count==='all'?shuffled(quizData):shuffled(quizData).slice(0,Number(count));
+    quizIndex=0;
+    quizCorrect=0;
+    quizAnswered=false;
+    renderQuizTrainer();
+  }
+  function renderQuizTrainer(){
+    const host=$('quizTrainer'),total=quizSet.length;
+    $('quizProgressBar').style.width=`${total?quizIndex/total*100:0}%`;
+    $('quizProgressText').textContent=quizIndex<total?`${quizIndex+1} / ${total}`:`${total} / ${total}`;
+    $('quizScoreText').textContent=`${quizCorrect} верных`;
+
+    if(quizIndex>=total){
+      const pct=total?Math.round(quizCorrect/total*100):0;
+      $('quizProgressBar').style.width='100%';
+      host.innerHTML=`<div class="quiz-summary"><strong>${quizCorrect} / ${total}</strong><span>${pct}% правильных ответов</span><button class="button trainer-next" id="quizAgain" type="button">Пройти ещё раз</button></div>`;
+      $('quizAgain').addEventListener('click',()=>startQuiz(quizCountMode));
+      return;
+    }
+
+    const item=quizSet[quizIndex];
+    host.innerHTML=`<div class="trainer-question">${quizIndex+1}. ${item.q}</div><div class="trainer-options" id="trainerOptions"></div><div class="trainer-feedback" id="trainerFeedback">Выберите ответ.</div><button class="button primary trainer-next" id="trainerNext" type="button" hidden>${quizIndex===total-1?'Завершить':'Следующий вопрос'}</button>`;
+    const opts=$('trainerOptions'),fb=$('trainerFeedback'),next=$('trainerNext');
+
+    item.o.forEach((text,oi)=>{
+      const b=document.createElement('button');
+      b.type='button';
+      b.textContent=text;
+      b.addEventListener('click',()=>{
+        if(quizAnswered)return;
+        quizAnswered=true;
+        [...opts.children].forEach(x=>x.disabled=true);
+        if(oi===item.a){
+          b.classList.add('correct');
+          quizCorrect++;
+        }else{
+          b.classList.add('wrong');
+          opts.children[item.a].classList.add('correct');
+        }
+        fb.textContent=item.e;
+        $('quizScoreText').textContent=`${quizCorrect} верных`;
+        next.hidden=false;
+      });
+      opts.append(b);
+    });
+
+    next.addEventListener('click',()=>{
+      quizIndex++;
+      quizAnswered=false;
+      renderQuizTrainer();
+    });
+  }
+
+  $$('#quizModeButtons button').forEach(btn=>btn.addEventListener('click',()=>{
+    $$('#quizModeButtons button').forEach(b=>b.classList.toggle('active',b===btn));
+    startQuiz(btn.dataset.count==='all'?'all':Number(btn.dataset.count));
+  }));
+  $('quizRestart').addEventListener('click',()=>startQuiz(quizCountMode));
 
   // ---------- init ----------
   function init(){
-    renderMeasurement();renderEditableCounts();renderStatStep();renderFrequencyHistogram();renderPoisson();renderGrouping();renderErrorSlider();renderWorkflow();loadJournal();renderQuiz();
+    renderMeasurement();renderEditableCounts();renderStatStep();renderFrequencyHistogram();renderPoisson();renderGrouping();renderErrorSlider();renderWorkflow();loadJournal();setProgramMode('replay');renderProgram();startQuiz(10);
   }
-  let resizeTimer=null;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{renderPoisson();if(currentData.length)drawAnalysisChart()},120)});
+  let resizeTimer=null;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{renderPoisson();if(currentData.length)drawAnalysisChart();if(programShown.length)drawProgramHistogram()},120)});
   init();
 })();

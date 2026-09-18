@@ -5,13 +5,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Интерактивный учебный материал к лабораторной работе 1.1.4: статистические закономерности на примере фона космического излучения.">
   <title>1.1.4 — Статистика космического фона</title>
-  <link rel="stylesheet" href="styles.css?v=0.10">
+  <link rel="stylesheet" href="styles.css?v=0.11">
 </head>
 <body>
 <header class="topbar">
   <div class="topbar-inner">
     <a class="brand" href="../../../">Интерактивные материалы МФТИ</a>
     <nav class="topnav" aria-label="Навигация по работе">
+      <a href="#theory">Теория с нуля</a>
       <a href="#measure">Измерение</a>
       <a href="#statistics">Статистика</a>
       <a href="#poisson">Пуассон</a>
@@ -30,6 +31,7 @@
       <p class="hero-lead">Не набор формул, а маршрут по работе: что именно считает установка, откуда берутся среднее и разброс, как появляется гистограмма, почему здесь нужен закон Пуассона и что меняется при группировке измерений.</p>
       <div class="hero-actions">
         <a class="button primary" href="#measure">Начать с измерения</a>
+        <a class="button" href="#theory">Мне нужна теория с нуля</a>
         <a class="button" href="#analyzer">У меня уже есть данные</a>
       </div>
     </div>
@@ -40,17 +42,241 @@
     </aside>
   </section>
 
-  <section class="route" aria-label="Маршрут по работе">
+  <section class="route route-eight" aria-label="Маршрут по работе">
+    <a href="#theory"><b>0</b><span>Теория с нуля</span></a>
     <a href="#measure"><b>1</b><span>Что измеряется</span></a>
     <a href="#statistics"><b>2</b><span>Как описать серию</span></a>
     <a href="#histogram"><b>3</b><span>Как читать гистограмму</span></a>
-    <a href="#poisson"><b>4</b><span>Что предсказывает Пуассон</span></a>
-    <a href="#grouping"><b>5</b><span>Зачем менять τ</span></a>
-    <a href="#error"><b>6</b><span>Откуда берётся ошибка</span></a>
-    <a href="#analyzer"><b>7</b><span>Применить к своим данным</span></a>
+    <a href="#poisson"><b>4</b><span>Пуассон и Гаусс</span></a>
+    <a href="#grouping"><b>5</b><span>Группировка и ошибка</span></a>
+    <a href="#analyzer"><b>6</b><span>Свои данные</span></a>
+    <a href="#program"><b>7</b><span>Учебная программа</span></a>
   </section>
 
-  <section id="measure" class="lesson-section">
+  
+  <section id="theory" class="lesson-section theory-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">00 · теория с нуля</div><h2>Вся теория, которая нужна для этой работы</h2></div>
+      <p>Раздел специально свёрнут по темам. Его можно пройти с самого начала или открывать только незнакомые понятия. Здесь раскрываются только обозначения, формулы и идеи из предоставленной методички 1.1.4.</p>
+    </div>
+
+    <div class="theory-toolbar">
+      <div>
+        <strong>Если статистика почти новая</strong>
+        <span>Идите сверху вниз: выборка → среднее → дисперсия → ошибка → гистограмма → Пуассон → Гаусс → группировка.</span>
+      </div>
+      <div class="theory-toolbar-actions">
+        <button class="button" id="openAllTheory" type="button">Развернуть всё</button>
+        <button class="button" id="closeAllTheory" type="button">Свернуть всё</button>
+      </div>
+    </div>
+
+    <div class="theory-accordion" id="theoryAccordion">
+      <details class="theory-item">
+        <summary><span class="theory-index">1</span><div><strong>Выборка, N и nᵢ</strong><small>Что вообще считается данными?</small></div><span class="theory-plus">+</span></summary>
+        <div class="theory-body">
+          <div class="theory-copy">
+            <h3>Один интервал даёт одно число</h3>
+            <p>Счётчик регистрирует отдельные импульсы. В каждом временном интервале длительности τ программа получает число регистраций. Для i-го интервала это число обозначается <b>nᵢ</b>.</p>
+            <p>Если интервалов было N, весь результат можно записать как последовательность <b>n₁, n₂, …, nᴺ</b>. Это исходная серия, из которой дальше считаются все статистические величины.</p>
+            <div class="zero-note"><b>N</b> — количество измерений, а <b>nᵢ</b> — результат одного конкретного измерения. Это разные величины.</div>
+          </div>
+          <div class="theory-side">
+            <div class="notation-card"><span>nᵢ</span><p>«эн с индексом и» — число регистраций в i-м интервале</p></div>
+            <div class="notation-card"><span>N</span><p>общее число измерений в серии</p></div>
+            <a class="theory-jump" href="#measure">Увидеть интервалы на временной шкале →</a>
+          </div>
+        </div>
+      </details>
+
+      <details class="theory-item">
+        <summary><span class="theory-index">2</span><div><strong>Среднее ⟨n⟩</strong><small>Как одним числом описать уровень серии?</small></div><span class="theory-plus">+</span></summary>
+        <div class="theory-body">
+          <div class="theory-copy">
+            <h3>Складываем все результаты и делим на их число</h3>
+            <div class="theory-formula">⟨n⟩ = (1/N) Σ nᵢ</div>
+            <p>Среднее отвечает на вопрос, какой уровень числа регистраций характерен для всей серии. Оно само по себе ничего не говорит о ширине разброса отдельных результатов.</p>
+            <p>Знак <b>Σ</b> читается «сумма»: нужно сложить значения, по которым идёт суммирование.</p>
+          </div>
+          <div class="theory-side">
+            <div class="notation-card"><span>⟨n⟩</span><p>читается «среднее эн»</p></div>
+            <div class="notation-card"><span>Σ</span><p>знак суммирования</p></div>
+            <a class="theory-jump" href="#statistics">Посчитать среднее на интерактиве →</a>
+          </div>
+        </div>
+      </details>
+
+      <details class="theory-item">
+        <summary><span class="theory-index">3</span><div><strong>Отклонение, дисперсия и σₙ</strong><small>Как измерить разброс результатов?</small></div><span class="theory-plus">+</span></summary>
+        <div class="theory-body">
+          <div class="theory-copy">
+            <h3>Среднего недостаточно: нужна мера ширины</h3>
+            <p>Отклонение отдельного результата от среднего — это <b>nᵢ − ⟨n⟩</b>. Положительные и отрицательные отклонения взаимно компенсируются, поэтому в дисперсии они возводятся в квадрат.</p>
+            <div class="theory-formula">σₙ² = (1/N) Σ (nᵢ − ⟨n⟩)²</div>
+            <p>В этой методичке дисперсия определяется именно с делением на <b>N</b>. Есть и сокращённая форма:</p>
+            <div class="theory-formula secondary">σₙ² = ⟨n²⟩ − ⟨n⟩²</div>
+            <p>Стандартное отклонение — квадратный корень из дисперсии:</p>
+            <div class="theory-formula secondary">σₙ = √σₙ²</div>
+          </div>
+          <div class="theory-side">
+            <div class="compare-mini"><b>σₙ²</b><span>дисперсия</span></div>
+            <div class="compare-mini"><b>σₙ</b><span>стандартное отклонение; разброс отдельных nᵢ</span></div>
+            <a class="theory-jump" href="#statistics">Посмотреть квадраты отклонений →</a>
+          </div>
+        </div>
+      </details>
+
+      <details class="theory-item">
+        <summary><span class="theory-index">4</span><div><strong>Ошибка среднего σ⟨n⟩</strong><small>Почему разброс данных и точность среднего — не одно и то же?</small></div><span class="theory-plus">+</span></summary>
+        <div class="theory-body">
+          <div class="theory-copy">
+            <h3>σₙ относится к отдельным отсчётам, σ⟨n⟩ — к найденному среднему</h3>
+            <div class="theory-formula">σ⟨n⟩ = σₙ / √N</div>
+            <p>Даже если отдельные значения заметно флуктуируют, среднее по длинной серии определяется точнее. В формуле это выражено множителем <b>1/√N</b>.</p>
+            <p>Методичка использует запись результата вида <b>⟨n⟩ ± σₙ/√N</b> как оценку области для среднего.</p>
+          </div>
+          <div class="theory-side">
+            <div class="do-not-confuse"><b>Не путать</b><span>σₙ — разброс данных</span><span>σ⟨n⟩ — ошибка среднего</span></div>
+            <a class="theory-jump" href="#error">Пощупать зависимость ошибки →</a>
+          </div>
+        </div>
+      </details>
+
+      <details class="theory-item">
+        <summary><span class="theory-index">5</span><div><strong>Гистограмма, Nₙ и wₙ</strong><small>Как длинный список чисел превращается в распределение?</small></div><span class="theory-plus">+</span></summary>
+        <div class="theory-body">
+          <div class="theory-copy">
+            <h3>Считаем, сколько раз встретилось каждое значение</h3>
+            <p>Для фиксированного n величина <b>Nₙ</b> — число измерений, в которых получилось именно это n. Экспериментальная частота:</p>
+            <div class="theory-formula">wₙ = Nₙ / N</div>
+            <p>Столбец гистограммы для n показывает эту частоту. Поэтому гистограмма описывает не порядок отсчётов во времени, а то, как часто встречались разные результаты.</p>
+          </div>
+          <div class="theory-side">
+            <div class="compare-mini"><b>Nₙ</b><span>сколько раз встретилось конкретное n</span></div>
+            <div class="compare-mini"><b>N</b><span>сколько измерений было всего</span></div>
+            <a class="theory-jump" href="#histogram">Разобрать столбец гистограммы →</a>
+          </div>
+        </div>
+      </details>
+
+      <details class="theory-item">
+        <summary><span class="theory-index">6</span><div><strong>Распределение Пуассона</strong><small>Что теоретически ожидается для числа регистраций?</small></div><span class="theory-plus">+</span></summary>
+        <div class="theory-body">
+          <div class="theory-copy">
+            <h3>Экспериментальную гистограмму сравнивают с формулой</h3>
+            <div class="theory-formula">wₙ = (n̄ⁿ / n!) e<sup>−n̄</sup></div>
+            <p>Здесь <b>n̄</b> — среднее число событий. Формула задаёт теоретическую вероятность получить ровно n регистраций за выбранный интервал.</p>
+            <p>Ключевое свойство для работы:</p>
+            <div class="theory-formula secondary">σ = √n̄</div>
+            <p>Поэтому экспериментально сравнивают <b>σₙ</b> и <b>√⟨n⟩</b>.</p>
+          </div>
+          <div class="theory-side">
+            <div class="notation-card"><span>n!</span><p>факториал n</p></div>
+            <div class="notation-card"><span>e</span><p>число в экспоненте формулы Пуассона</p></div>
+            <a class="theory-jump" href="#poisson">Менять n̄ и видеть распределение →</a>
+          </div>
+        </div>
+      </details>
+
+      <details class="theory-item">
+        <summary><span class="theory-index">7</span><div><strong>Гауссово приближение и интервалы σ</strong><small>Когда Пуассон становится похож на нормальное распределение?</small></div><span class="theory-plus">+</span></summary>
+        <div class="theory-body">
+          <div class="theory-copy">
+            <h3>При достаточно большом среднем методичка предлагает гауссово приближение</h3>
+            <p>В предоставленной методичке указан практический ориентир <b>n̄ ≳ 10</b>.</p>
+            <div class="sigma-theory-row">
+              <div><b>≈ 68%</b><span>в пределах ±σ</span></div>
+              <div><b>≈ 95%</b><span>в пределах ±2σ</span></div>
+              <div><b>≈ 99,7%</b><span>в пределах ±3σ</span></div>
+            </div>
+            <p>Эти доли затем проверяются на экспериментальной серии.</p>
+          </div>
+          <div class="theory-side">
+            <div class="do-not-confuse"><b>В контексте работы</b><span>Гаусс здесь используется как приближение формы Пуассона при большом среднем.</span></div>
+            <a class="theory-jump" href="#poisson">Включить Гаусс поверх Пуассона →</a>
+          </div>
+        </div>
+      </details>
+
+      <details class="theory-item">
+        <summary><span class="theory-index">8</span><div><strong>Группировка, τ и интенсивность j</strong><small>Что меняется при другом интервале времени?</small></div><span class="theory-plus">+</span></summary>
+        <div class="theory-body">
+          <div class="theory-copy">
+            <h3>Более длинный интервал — это сумма соседних исходных отсчётов</h3>
+            <p>Если исходные данные записаны через τ₀ = 1 с, то для τ = 10 с складываются десять последовательных значений.</p>
+            <p>Чтобы сравнивать результаты при разных τ, используется средняя интенсивность:</p>
+            <div class="theory-formula">j = ⟨n⟩ / τ</div>
+            <div class="theory-formula secondary">σⱼ = σ⟨n⟩ / τ</div>
+          </div>
+          <div class="theory-side">
+            <div class="notation-card"><span>τ</span><p>«тау» — длительность одного интервала</p></div>
+            <div class="notation-card"><span>j</span><p>средняя интенсивность счёта</p></div>
+            <a class="theory-jump" href="#grouping">Увидеть группировку ячеек →</a>
+          </div>
+        </div>
+      </details>
+
+      <details class="theory-item">
+        <summary><span class="theory-index">9</span><div><strong>Относительная ошибка и nΣ</strong><small>Почему важно общее число событий?</small></div><span class="theory-plus">+</span></summary>
+        <div class="theory-body">
+          <div class="theory-copy">
+            <h3>Для пуассоновского процесса формула упрощается</h3>
+            <div class="theory-formula">ε⟨n⟩ = 1 / √(⟨n⟩N) = 1 / √nΣ</div>
+            <div class="theory-formula secondary">nΣ = ⟨n⟩N = Σ nᵢ</div>
+            <p>Поэтому точность определяется общим числом зарегистрированных событий. Методичка отмечает ориентир: для относительной ошибки порядка <b>1%</b> нужно примерно <b>10⁴</b> событий.</p>
+          </div>
+          <div class="theory-side">
+            <div class="compare-mini"><b>10² событий</b><span>ошибка порядка 10%</span></div>
+            <div class="compare-mini"><b>10⁴ событий</b><span>ошибка порядка 1%</span></div>
+            <a class="theory-jump" href="#error">Проверить ползунком →</a>
+          </div>
+        </div>
+      </details>
+
+      <details class="theory-item">
+        <summary><span class="theory-index">10</span><div><strong>Экспоненциальное распределение и Парето</strong><small>Что про них требуется именно в этой работе?</small></div><span class="theory-plus">+</span></summary>
+        <div class="theory-body">
+          <div class="theory-copy">
+            <h3>Они появляются в задании на симуляцию</h3>
+            <p>Методичка просит переключить генератор штатной программы на экспоненциальное распределение и на распределение Парето, отдельно исследуя Парето при <b>α = 2,0</b> и <b>α = 1,0</b>.</p>
+            <p>В предоставленном материале не задаётся точная программная формула этих генераторов. Поэтому сайт не вводит свою параметризацию и не выдаёт её за лабораторную.</p>
+            <div class="zero-note"><b>Веб-версия ниже воспроизводит только Пуассон.</b> Для экспоненциального и Парето остаются задание и журнал наблюдений — ровно то, что поддерживается источником.</div>
+          </div>
+          <div class="theory-side">
+            <div class="compare-mini"><b>Парето</b><span>α = 2,0 и α = 1,0</span></div>
+            <div class="compare-mini"><b>Экспоненциальное</b><span>режим штатного генератора</span></div>
+            <a class="theory-jump" href="#program">Перейти к учебной программе →</a>
+          </div>
+        </div>
+      </details>
+
+      <details class="theory-item">
+        <summary><span class="theory-index">∑</span><div><strong>Словарь обозначений</strong><small>Как читать формулы страницы</small></div><span class="theory-plus">+</span></summary>
+        <div class="theory-body theory-body-one">
+          <div class="notation-grid">
+            <div><b>nᵢ</b><span>число регистраций в i-м интервале</span></div>
+            <div><b>N</b><span>число измерений</span></div>
+            <div><b>⟨n⟩</b><span>среднее число регистраций</span></div>
+            <div><b>Σ</b><span>суммирование</span></div>
+            <div><b>σₙ²</b><span>дисперсия</span></div>
+            <div><b>σₙ</b><span>стандартное отклонение</span></div>
+            <div><b>σ⟨n⟩</b><span>ошибка среднего</span></div>
+            <div><b>Nₙ</b><span>сколько раз встретилось значение n</span></div>
+            <div><b>wₙ</b><span>частота / теоретическая вероятность в соответствующем контексте</span></div>
+            <div><b>τ</b><span>длительность интервала</span></div>
+            <div><b>j</b><span>средняя интенсивность</span></div>
+            <div><b>σⱼ</b><span>ошибка средней интенсивности</span></div>
+            <div><b>nΣ</b><span>общее число зарегистрированных событий</span></div>
+            <div><b>ε</b><span>относительная ошибка</span></div>
+            <div><b>n!</b><span>факториал n</span></div>
+            <div><b>e</b><span>число в формуле Пуассона</span></div>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+<section id="measure" class="lesson-section">
     <div class="section-heading">
       <div><div class="eyebrow">01 · измерение</div><h2>Что на самом деле записывает установка</h2></div>
       <p>Счётчик Гейгера–Мюллера регистрирует отдельные импульсы. Программа считает, сколько импульсов попало в каждый интервал времени.</p>
@@ -267,45 +493,158 @@
     </div>
   </section>
 
+  
   <section id="program" class="lesson-section program-section">
     <div class="section-heading">
-      <div><div class="eyebrow">09 · симуляция в лабораторной программе</div><h2>Здесь мы не подменяем программу своей</h2></div>
-      <p>Методичка просит исследовать дополнительные распределения в лабораторном ПО. Она не задаёт здесь их программную параметризацию, поэтому сайт не придумывает собственный генератор.</p>
+      <div><div class="eyebrow">09 · учебная версия программы</div><h2>После лабы программу можно открыть здесь</h2></div>
+      <p>Это не копия исходного ПО и не имитация аппаратуры. Веб-версия воспроизводит только те операции, которые однозначно задаются методичкой: просмотр серии, текущие статистики, гистограмму и симуляцию закона Пуассона.</p>
     </div>
 
-    <div class="program-grid">
-      <article><span>01</span><h3>Меняйте N</h3><p>Следите за средним, σ, ошибкой среднего, гистограммой и сравнением с теоретическим распределением.</p></article>
-      <article><span>02</span><h3>Меняйте интенсивность μ</h3><p>Сравните, как меняются среднее, ширина и форма распределения.</p></article>
-      <article><span>03</span><h3>Экспоненциальное распределение</h3><p>Переключите генератор в самой лабораторной программе и выполните требуемые наблюдения там.</p></article>
-      <article><span>04</span><h3>Парето: α = 2,0 и α = 1,0</h3><p>Методичка отдельно предлагает эти значения для исследования ограничений привычного поведения сумм случайных величин.</p></article>
+    <div class="program-window">
+      <div class="program-titlebar">
+        <div><span class="program-dot"></span><span class="program-dot"></span><span class="program-dot"></span><strong>1.1.4 · учебная программа</strong></div>
+        <div class="program-scope">полностью в браузере</div>
+      </div>
+
+      <div class="program-tabs segmented" id="programModeButtons">
+        <button class="active" data-mode="replay" type="button">Эксперимент / файл</button>
+        <button data-mode="poisson" type="button">Симуляция Пуассона</button>
+      </div>
+
+      <div class="program-body">
+        <aside class="program-controls">
+          <div id="programReplayControls">
+            <h3>Источник серии</h3>
+            <p>Режим воспроизводит уже записанные отсчёты. К аппаратуре сайт не подключается.</p>
+            <button class="button program-wide" id="progUseAnalyzer" type="button">Взять данные из анализатора</button>
+            <button class="button program-wide" id="progUseSample" type="button">Учебная серия 4000 отсчётов</button>
+          </div>
+
+          <div id="programPoissonControls" hidden>
+            <h3>Параметры Пуассона</h3>
+            <label>Среднее n̄
+              <input id="progPoissonMean" type="range" min="1" max="30" step="1" value="6">
+              <span class="program-range-value" id="progPoissonMeanValue">6</span>
+            </label>
+            <label>Размер серии N
+              <select id="progPoissonN">
+                <option value="100">100</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
+                <option value="4000" selected>4000</option>
+              </select>
+            </label>
+            <button class="button primary program-wide" id="progGenerate" type="button">Сгенерировать серию</button>
+            <p class="program-method-note">Генератор использует только закон Пуассона, формула которого дана в методичке. Экспоненциальное и Парето здесь намеренно не генерируются.</p>
+          </div>
+
+          <hr>
+
+          <h3>Воспроизведение</h3>
+          <label>Скорость
+            <select id="progSpeed">
+              <option value="1">1 отсчёт за шаг</option>
+              <option value="5">5 за шаг</option>
+              <option value="20" selected>20 за шаг</option>
+              <option value="100">100 за шаг</option>
+            </select>
+          </label>
+
+          <div class="program-run-buttons">
+            <button class="button primary" id="progStart" type="button">Старт</button>
+            <button class="button" id="progPause" type="button">Пауза</button>
+            <button class="button" id="progReset" type="button">Сброс</button>
+          </div>
+
+          <button class="text-button" id="progToAnalyzer" type="button">Передать всю серию в анализатор ↓</button>
+          <div class="program-data-info" id="progDataInfo">Серия ещё не выбрана.</div>
+        </aside>
+
+        <div class="program-display">
+          <div class="program-metrics">
+            <div><span>N сейчас</span><b id="progLiveN">0</b></div>
+            <div><span>текущее nᵢ</span><b id="progLiveCurrent">—</b></div>
+            <div><span>⟨n⟩</span><b id="progLiveMean">—</b></div>
+            <div><span>σₙ</span><b id="progLiveSigma">—</b></div>
+            <div><span>σ⟨n⟩</span><b id="progLiveSem">—</b></div>
+          </div>
+
+          <div class="program-recent-wrap">
+            <div class="panel-head"><strong>Последние отсчёты</strong><span id="progCursorLabel">0 / 0</span></div>
+            <div class="program-recent" id="progRecent"></div>
+          </div>
+
+          <div class="program-chart-wrap">
+            <div class="panel-head"><strong>Гистограмма накопленных данных</strong><span id="progChartNote">wₙ = Nₙ/N</span></div>
+            <canvas id="programChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="program-boundaries">
+      <article>
+        <div class="method-label">Веб-версия умеет</div>
+        <h3>То, что определяется методичкой однозначно</h3>
+        <ul>
+          <li>воспроизводить файл отсчётов и показывать рост N;</li>
+          <li>считать ⟨n⟩, σₙ и σ⟨n⟩;</li>
+          <li>строить текущую гистограмму;</li>
+          <li>генерировать выборку по закону Пуассона;</li>
+          <li>передавать полученную серию в полный анализатор.</li>
+        </ul>
+      </article>
+
+      <article>
+        <div class="method-label warm-label">Остаётся заданием штатной программы</div>
+        <h3>Экспоненциальное и Парето</h3>
+        <p>Методичка требует переключить генератор на экспоненциальное распределение и исследовать Парето при α = 2,0 и α = 1,0, но не задаёт здесь формулу программного генератора. Поэтому сайт не вводит своё соглашение.</p>
+      </article>
     </div>
 
     <div class="observation-journal">
-      <div class="journal-head"><div><h3>Мини-журнал наблюдений</h3><p>Можно записать выводы прямо здесь. Они сохраняются только в браузере.</p></div><button class="text-button" id="clearJournal" type="button">Очистить</button></div>
+      <div class="journal-head"><div><h3>Мини-журнал наблюдений</h3><p>Можно записать выводы из штатной программы или из веб-версии. Записи сохраняются только в браузере.</p></div><button class="text-button" id="clearJournal" type="button">Очистить</button></div>
       <div class="journal-grid">
-        <label>При увеличении N<textarea data-journal="n" placeholder="Что вы увидели?"></textarea></label>
+        <label>При увеличении N<textarea data-journal="n" placeholder="Что происходит со средним и ошибкой?"></textarea></label>
         <label>При изменении μ<textarea data-journal="mu" placeholder="Что меняется на гистограмме?"></textarea></label>
-        <label>Экспоненциальное<textarea data-journal="exp" placeholder="Наблюдение"></textarea></label>
+        <label>Экспоненциальное<textarea data-journal="exp" placeholder="Наблюдение из штатной программы"></textarea></label>
         <label>Парето<textarea data-journal="pareto" placeholder="Сравните α = 2,0 и α = 1,0"></textarea></label>
       </div>
     </div>
   </section>
 
+
   <section id="check" class="lesson-section check-section">
     <div class="section-heading">
-      <div><div class="eyebrow">10 · самопроверка</div><h2>Пять вопросов перед обработкой</h2></div>
-      <p>Ответ не нужно угадывать: каждый следует из формул и интерактивов выше.</p>
+      <div><div class="eyebrow">10 · самопроверка</div><h2>Тренажёр вопросов по всей работе</h2></div>
+      <p>В банке больше вопросов, чем нужно за один проход. Можно пройти десять случайных или полный набор. После каждого ответа показывается объяснение из теории страницы.</p>
     </div>
-    <div class="quiz" id="quiz"></div>
+
+    <div class="quiz-shell">
+      <div class="quiz-toolbar">
+        <div class="segmented" id="quizModeButtons">
+          <button class="active" data-count="10" type="button">10 случайных</button>
+          <button data-count="all" type="button">Все вопросы</button>
+        </div>
+        <button class="button" id="quizRestart" type="button">Начать заново</button>
+      </div>
+
+      <div class="quiz-progress-row">
+        <div class="quiz-progress"><i id="quizProgressBar"></i></div>
+        <div><b id="quizProgressText">1 / 10</b><span id="quizScoreText">0 верных</span></div>
+      </div>
+
+      <div id="quizTrainer" class="quiz-trainer"></div>
+    </div>
   </section>
 
-  <section class="source-rule">
+<section class="source-rule">
     <strong>Правило этой страницы</strong>
     <p>Содержание построено только по предоставленной методичке лабораторной 1.1.4. Если методичка не задаёт деталь — например, конкретную параметризацию генератора экспоненциального распределения или Парето — сайт не заполняет пробел внешней теорией.</p>
   </section>
 </main>
 
-<footer class="footer"><a href="../">← Каталог лабораторных</a><span>1.1.4 · редакция 0.10</span></footer>
-<script src="app.js?v=0.10"></script>
+<footer class="footer"><a href="../">← Каталог лабораторных</a><span>1.1.4 · редакция 0.11</span></footer>
+<script src="app.js?v=0.11"></script>
 </body>
 </html>
