@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Личная книжная полка и каталог учебников поверх публичной папки Яндекс Диска.">
   <title>Библиотека — Интерактивные материалы МФТИ</title>
-  <link rel="stylesheet" href="../assets/site.css?v=0.9">
+  <link rel="stylesheet" href="../assets/site.css?v=0.17">
   <link rel="stylesheet" href="bookshelf.css?v=0.9">
 </head>
 <body>
@@ -14,7 +14,9 @@
     <a class="brand" href="../">Интерактивные материалы МФТИ</a>
     <div class="nav-links">
       <a href="../physics/">Физика</a>
+      <a href="../analytic-geometry/">Ангем</a>
       <a aria-current="page" href="./">Библиотека</a>
+      <a href="../about/">О проекте</a>
     </div>
   </nav>
 </header>
@@ -75,7 +77,7 @@
           <h2 id="catalogSectionTitle">—</h2>
           <button class="section-switch" id="chooseSectionBtn" type="button">Сменить раздел</button>
         </div>
-        <p>Каталог показывает только выбранный крупный раздел источника. Другие курсы не мешают.</p>
+        <p>Каталог показывает только выбранный крупный раздел источника, чтобы остальные разделы не перегружали интерфейс.</p>
       </div>
       <button class="dialog-close" id="closeCatalog" type="button" aria-label="Закрыть">×</button>
     </header>
@@ -116,8 +118,8 @@
     <div class="dialog-heading">
       <div>
         <div class="kicker">Раздел источника</div>
-        <h2>Что использовать как библиотеку?</h2>
-        <p>Например, выберите «1 курс». В обычной работе остальные крупные разделы больше не будут занимать место.</p>
+        <h2>Выберите раздел библиотеки</h2>
+        <p>Например, можно выбрать «1 курс». Каталог будет работать внутри этого раздела; переключиться на другой можно в любой момент.</p>
       </div>
       <button class="dialog-close" id="closeSectionDialog" type="button" aria-label="Закрыть">×</button>
     </div>
