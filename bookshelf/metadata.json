@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "books": [
+    {
+      "id": "kudryavtsev-analysis-1",
+      "title": "Курс математического анализа",
+      "author": "Л. Д. Кудрявцев",
+      "volume": "Том 1",
+      "subject": "Calculus",
+      "kind": "Textbook",
+      "aliases": ["кудрявцев 1 том", "кудрявцев том 1", "кудрявцев 1", "kudryavtsev 1", "кудрявцев курс математического анализа 1"]
+    },
+    {
+      "id": "kudryavtsev-analysis-2",
+      "title": "Курс математического анализа",
+      "author": "Л. Д. Кудрявцев",
+      "volume": "Том 2",
+      "subject": "Calculus",
+      "kind": "Textbook",
+      "aliases": ["кудрявцев 2 том", "кудрявцев том 2", "кудрявцев 2", "kudryavtsev 2", "кудрявцев курс математического анализа 2"]
+    },
+    {
+      "id": "kudryavtsev-analysis-3",
+      "title": "Курс математического анализа",
+      "author": "Л. Д. Кудрявцев",
+      "volume": "Том 3",
+      "subject": "Calculus",
+      "kind": "Textbook",
+      "aliases": ["кудрявцев 3 том", "кудрявцев том 3", "кудрявцев 3", "kudryavtsev 3", "кудрявцев курс математического анализа 3"]
+    },
+    {
+      "id": "demidovich",
+      "title": "Сборник задач и упражнений по математическому анализу",
+      "author": "Б. П. Демидович",
+      "subject": "Calculus",
+      "kind": "Problem book",
+      "aliases": ["демидович", "demidovich"]
+    },
+    {
+      "id": "beklemishev-geometry",
+      "title": "Курс аналитической геометрии и линейной алгебры",
+      "author": "Д. В. Беклемишев",
+      "subject": "Linear Algebra & Geometry",
+      "kind": "Textbook",
+      "aliases": ["беклемишев", "ангем и линал беклемишев", "аналитическая геометрия беклемишев", "beklemishev"]
+    },
+    {
+      "id": "beklemishev-problems",
+      "title": "Задачи по аналитической геометрии и линейной алгебре",
+      "author": "Д. В. Беклемишев",
+      "subject": "Linear Algebra & Geometry",
+      "kind": "Problem book",
+      "aliases": ["задачник беклемишев", "беклемишев задачи", "решения задач беклемишев"]
+    },
+    {
+      "id": "umnov-linear-algebra",
+      "title": "Линейная алгебра",
+      "author": "А. Е. Умнов",
+      "subject": "Linear Algebra & Geometry",
+      "kind": "Textbook",
+      "aliases": ["умнов линал", "умнов линейная алгебра", "умнов", "umnov"]
+    },
+    {
+      "id": "ovchinkin-problems",
+      "title": "Сборник задач по математическому анализу",
+      "author": "",
+      "subject": "Calculus",
+      "kind": "Problem book",
+      "aliases": ["овчинкин задачник", "овчинкин"]
+    }
+  ]
+}

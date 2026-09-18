@@ -1,100 +1,81 @@
-# MIPT Physics Labs
+# MIPT Study Tools
 
-Interactive educational tools for physics laboratory work at MIPT.
+A growing collection of lightweight interactive study materials for MIPT courses.
 
-The project is built around a simple idea: laboratory software should help students understand the experiment and the data analysis, not replace the work itself. Each lab page combines concise theory, visual explanations, interactive calculations, and tools for working with real experimental data.
+The repository still uses its original GitHub repository name for compatibility, but the site itself is now organized as a broader study project rather than a physics-labs-only collection.
 
-## Current Labs
+## Current sections
 
-### 1.1.4 — Statistics of Cosmic-Ray Background
+### Physics
 
-An interactive companion for the laboratory on statistical analysis of cosmic-ray background measurements.
+Interactive material for physics courses and laboratory work.
 
-Main features:
+Currently available:
 
-- parsing of laboratory data files with `#` comments;
-- calculation of the mean, variance, standard deviation, and uncertainty of the mean;
-- counting-rate calculation;
-- grouping measurements into larger time intervals;
-- experimental histograms;
-- comparison with the Poisson distribution;
-- Gaussian approximation for larger mean counts;
-- comparison of `σ_n` with `sqrt(<n>)`;
-- visualization of sample-mean convergence;
-- visualization of the `1/sqrt(N)` behavior of the uncertainty;
-- interactive examples of Poisson, exponential, and Pareto distributions;
-- short theory notes and self-check questions.
+- **Lab 1.1.4 — Statistics of cosmic-ray background**
+  - experimental data parser;
+  - grouping measurements by time interval;
+  - mean, variance, standard deviation and uncertainty of the mean;
+  - counting-rate calculation;
+  - Poisson and Gaussian comparison;
+  - convergence and log-log uncertainty plots;
+  - comparison of multiple time intervals;
+  - educational distribution simulator.
 
-## Project Structure
+### Bookshelf
+
+A local-first visual interface for public Yandex Disk libraries.
+
+The bookshelf does **not** contain or host the books themselves. A user provides a public Yandex Disk folder URL in the browser. That URL is saved locally using `localStorage` and is never stored in this repository.
+
+The bookshelf:
+
+- scans the public folder through the public Yandex Disk API;
+- finds PDF, DJVU and EPUB files;
+- groups recognized books by subject;
+- enriches known titles using static metadata from this repository;
+- provides shelf and list views;
+- supports local search;
+- opens a selected file through the Yandex Disk public viewer.
+
+## Structure
 
 ```text
-mipt-physics-labs/
+.
 ├── index.html
-├── README.md
+├── assets/
+│   └── site.css
+├── bookshelf/
+│   ├── index.html
+│   ├── bookshelf.css
+│   ├── bookshelf.js
+│   └── metadata.json
+├── physics/
+│   ├── index.html
+│   └── labs/
+│       ├── index.html
+│       └── 1.1.4/
+│           ├── index.html
+│           ├── styles.css
+│           ├── app.js
+│           └── sample_data.txt
 └── lab-1.1.4/
-    ├── index.html
-    ├── styles.css
-    ├── app.js
-    └── sample_data.txt
+    └── index.html
 ```
 
-Each laboratory is kept in its own directory:
+`lab-1.1.4/` is a compatibility redirect for the previous page location.
 
-```text
-lab-X.X.X/
-```
+## Design principles
 
-The root page serves as a common entry point for the collection.
+- Fully static: HTML, CSS and vanilla JavaScript only.
+- No backend, database, API secrets or build step.
+- Educational tools should explain the underlying idea rather than automatically generate finished coursework.
+- Subject areas remain independent and lightweight while sharing common navigation and styling.
+- External books and source material are linked or read from user-provided public sources rather than committed as large binary files.
 
-## Data Format
+## Planned areas
 
-The statistics lab accepts plain-text data with one numeric measurement per line.
-
-Lines beginning with `#` are treated as comments and ignored.
-
-Example:
-
-```text
-# measurement session
-1
-2
-1
-0
-3
-2
-1
-```
-
-All processing is performed locally in the browser.
-
-## Technology
-
-The project intentionally uses a lightweight stack:
-
-- HTML
-- CSS
-- Vanilla JavaScript
-
-There are no build tools, frameworks, or runtime dependencies.
-
-## Project Goals
-
-- make laboratory theory easier to understand visually;
-- connect formulas with real experimental data;
-- show the difference between statistical quantities and graphical representations;
-- help students verify their own calculations;
-- keep each tool simple enough to inspect and modify;
-- build a reusable collection for future physics labs.
-
-## Status
-
-The repository is under active development. New laboratory tools will be added as the corresponding experiments are completed.
-
-## Contributing
-
-Improvements, corrections, and new educational visualizations are welcome.
-
-When adding a new lab, keep it isolated in its own `lab-X.X.X/` directory and avoid introducing unnecessary dependencies.
+The structure is intended to expand with interactive materials for calculus, linear algebra, analytic geometry, general physics and additional laboratory work.
 
 ## License
 

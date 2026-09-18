@@ -1,39 +1,62 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>MIPT Physics Labs</title>
-  <style>
-    :root{--bg:#f4f6f8;--card:#fff;--ink:#17202a;--muted:#66717d;--line:#dfe4ea;--accent:#315f9a}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;line-height:1.55}
-    main{max-width:980px;margin:0 auto;padding:64px 20px}
-    .eyebrow{font-size:.82rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
-    h1{font-size:clamp(2.2rem,6vw,4.6rem);line-height:1;margin:10px 0 16px;letter-spacing:-.045em}
-    .lead{max-width:720px;color:#44505c;font-size:1.08rem}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:36px}
-    .card{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;transition:.15s}
-    .card:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(20,33,51,.08);border-color:#b7c6d8}
-    .tag{display:inline-block;background:#eaf1fa;color:var(--accent);padding:4px 9px;border-radius:999px;font-size:.8rem;font-weight:800}
-    h2{font-size:1.2rem;margin:12px 0 8px}
-    p{margin:0}.muted{color:var(--muted)}
-    footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
-  </style>
+  <meta name="description" content="Interactive study tools for MIPT courses and physics laboratories.">
+  <title>MIPT Study Tools</title>
+  <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
-<main>
-  <div class="eyebrow">Учебные интерактивные материалы</div>
-  <h1>MIPT Physics Labs</h1>
-  <p class="lead">Набор интерактивных помощников к лабораторным работам: теория, визуализации, обработка собственных данных и самопроверка.</p>
-  <div class="grid">
-    <a class="card" href="lab-1.1.4/">
-      <span class="tag">Лаба 1.1.4</span>
-      <h2>Статистика космического фона</h2>
-      <p class="muted">Пуассон, Гаусс, гистограммы, группировка по τ, погрешность среднего и анализ файла лабораторной программы.</p>
-    </a>
-  </div>
-  <footer>Новые лабораторные будут добавляться отдельными папками.</footer>
+<header class="site-header">
+  <nav class="site-nav" aria-label="Main navigation">
+    <a class="brand" href="./">MIPT Study Tools</a>
+    <div class="nav-links">
+      <a href="physics/">Physics</a>
+      <a href="bookshelf/">Bookshelf</a>
+    </div>
+  </nav>
+</header>
+<main class="page">
+  <section class="hero">
+    <div>
+      <div class="kicker">Interactive study collection</div>
+      <h1>Learn by<br>seeing it work.</h1>
+      <p class="lead">Small, focused tools for understanding university mathematics, physics and laboratory data — built as a fully static site.</p>
+    </div>
+    <p class="hero-note">The repository keeps its current GitHub name for now. The site structure is already prepared to grow beyond physics labs without breaking the existing public URL.</p>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div><div class="kicker">Explore</div><h2>Current sections</h2></div>
+      <p>Each topic stays independent and lightweight, while sharing a common navigation and visual language.</p>
+    </div>
+    <div class="grid">
+      <a class="card wide" href="physics/">
+        <span class="tag">Physics</span>
+        <h3>Physics & laboratory work</h3>
+        <p>Interactive lab companions, theory, data processing and later — standalone physics topics.</p>
+        <span class="arrow">Open physics →</span>
+      </a>
+      <a class="card small" href="bookshelf/">
+        <span class="tag">Library</span>
+        <h3>Bookshelf</h3>
+        <p>Connect a public Yandex Disk library locally in your browser and browse it as a visual bookshelf.</p>
+        <span class="arrow">Open bookshelf →</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><div><div class="kicker">Planned</div><h2>Next subject areas</h2></div><p>The folders can be added gradually without changing the project architecture.</p></div>
+    <div class="grid">
+      <article class="card small empty-card"><span class="tag">Mathematics</span><h3>Calculus</h3><p>Limits, derivatives, integration, series and visual intuition.</p></article>
+      <article class="card small empty-card"><span class="tag">Mathematics</span><h3>Linear algebra</h3><p>Matrices, determinants, systems, vector spaces and transformations.</p></article>
+      <article class="card small empty-card"><span class="tag">Mathematics</span><h3>Analytic geometry</h3><p>Vectors, lines, planes, conics and geometric meaning of algebraic formulas.</p></article>
+    </div>
+  </section>
 </main>
+<footer class="footer"><span>Static HTML · CSS · JavaScript</span><span>Educational project</span></footer>
 </body>
 </html>

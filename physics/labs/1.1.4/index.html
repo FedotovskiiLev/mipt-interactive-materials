@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Интерактивный учебный помощник к лабораторной работе 1.1.4 по статистике космического фона.">
+  <title>Лаба 1.1.4 — Статистика космического фона</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top"><div class="top-inner"><a class="home" href="../../../">MIPT Study Tools</a><nav class="top-nav"><a href="#theory">Теория</a><a href="#analyzer">Данные</a><a href="#graphs">Графики</a><a href="#simulator">Симулятор</a><a href="#check">Самопроверка</a></nav></div></header>
+<main>
+  <section class="hero">
+    <div><div class="kicker">Физика · лабораторная 1.1.4</div><h1>Статистика космического фона</h1><p class="lead">Интерактивный помощник к работе о случайном потоке частиц: распределение Пуассона, приближение Гаусса, группировка по времени и погрешность среднего.</p></div>
+    <aside class="hero-card"><strong>Что здесь можно сделать</strong><p>Загрузить собственный файл измерений, менять интервал τ, смотреть статистики и графики, сравнивать несколько τ и отдельно исследовать распределения на симуляции.</p></aside>
+  </section>
+
+  <section id="theory">
+    <div class="section-head"><div><div class="kicker">01 · смысл работы</div><h2>Минимум теории</h2></div><p>Счётчик Гейгера–Мюллера регистрирует отдельные события. Если поток стационарен, а события независимы, число регистраций за фиксированный интервал описывается законом Пуассона.</p></div>
+    <div class="grid">
+      <article class="card half"><h3>Среднее число событий</h3><div class="formula">⟨n⟩ = (1/N) Σ nᵢ</div><p>Это оценка среднего числа зарегистрированных частиц за выбранный интервал времени τ.</p></article>
+      <article class="card half"><h3>Разброс измерений</h3><div class="formula">σₙ² = (1/N) Σ (nᵢ − ⟨n⟩)²</div><p>В этой методичке дисперсия выборки определяется именно с делением на N. Для идеального пуассоновского потока ожидается σₙ ≈ √⟨n⟩.</p></article>
+      <article class="card third"><h3>Ошибка среднего</h3><div class="formula">σ⟨n⟩ = σₙ / √N</div><p>Чем больше независимых интервалов мы измерили, тем точнее знаем среднее.</p></article>
+      <article class="card third"><h3>Интенсивность</h3><div class="formula">j = ⟨n⟩ / τ</div><p>Она позволяет сравнивать серии с разным временем накопления.</p></article>
+      <article class="card third"><h3>Относительная ошибка</h3><div class="formula">ε = 1 / √nΣ</div><p>Для пуассоновского процесса nΣ = Σnᵢ. Чтобы получить примерно 1%, нужно порядка 10⁴ зарегистрированных событий.</p></article>
+      <article class="card full"><h3>Пуассон → Гаусс</h3><p>Вероятность получить ровно n событий при среднем μ равна <strong>P(n)=μⁿe⁻ᵘ/n!</strong>. При достаточно большом μ распределение становится близким к нормальному. Для нормального распределения примерно 68%, 95% и 99.7% значений лежат внутри ±σ, ±2σ и ±3σ.</p><p class="note">Здесь нормальная кривая на дискретной гистограмме считается с поправкой на непрерывность: сравнивается вероятность попасть в интервал [n−0.5, n+0.5].</p></article>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><div><div class="kicker">02 · ход мысли</div><h2>Что делать в эксперименте</h2></div></div>
+    <div class="card steps">
+      <div class="step"><div><strong>Получить длинную серию отсчётов.</strong><p>В современной версии работы обычно записывается около 4000 значений с базовым интервалом τ₀ = 1 с.</p></div></div>
+      <div class="step"><div><strong>Посмотреть на исходные данные.</strong><p>Найти ⟨n⟩, σₙ и σ⟨n⟩. Сравнить σₙ с √⟨n⟩.</p></div></div>
+      <div class="step"><div><strong>Сгруппировать соседние отсчёты.</strong><p>Например, для τ = 10 с сложить каждые десять последовательных значений. Для τ = 40 с — каждые сорок.</p></div></div>
+      <div class="step"><div><strong>Сравнить гистограммы.</strong><p>При росте τ растёт среднее число событий и пуассоновское распределение становится всё более похожим на гауссово.</p></div></div>
+      <div class="step"><div><strong>Проверить погрешность.</strong><p>Ошибка среднего должна уменьшаться приблизительно как 1/√N.</p></div></div>
+    </div>
+  </section>
+
+  <section id="analyzer">
+    <div class="section-head"><div><div class="kicker">03 · свои данные</div><h2>Анализатор</h2></div><p>Файл лабораторной программы может содержать строки-комментарии, начинающиеся с #. Они игнорируются.</p></div>
+    <div class="grid">
+      <div class="card half">
+        <h3>1. Загрузите файл или вставьте данные</h3>
+        <div class="drop"><input id="fileInput" type="file" accept=".txt,.dat,.csv,text/plain"><div class="status">или вставьте значения ниже</div></div>
+        <div class="field" style="margin-top:10px"><label for="dataText">Одно значение на строку или числа, разделённые пробелами</label><textarea id="dataText" spellcheck="false" placeholder="# comment&#10;1&#10;2&#10;1&#10;0"></textarea></div>
+        <div class="actions"><button class="btn primary" id="analyzeBtn" type="button">Анализировать</button><button class="btn" id="sampleBtn" type="button">Загрузить пример</button></div>
+        <div class="status" id="dataStatus">Данные ещё не загружены.</div>
+      </div>
+      <div class="card half">
+        <h3>2. Выберите интервал</h3>
+        <div class="controls">
+          <div class="field"><label for="baseTau">Базовый τ₀, с</label><input id="baseTau" type="number" min="0.001" step="any" value="1"></div>
+          <div class="field"><label for="tau">Анализируемый τ, с</label><input id="tau" type="number" min="0.001" step="any" value="10"></div>
+          <div class="field" style="grid-column:span 2"><label for="tauList">Сравнить интервалы, с</label><input id="tauList" type="text" value="1, 10, 20, 40, 80"></div>
+        </div>
+        <div class="stats" id="stats"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="graphs">
+    <div class="section-head"><div><div class="kicker">04 · визуализация</div><h2>Что показывают разные графики</h2></div><p>Они отвечают на разные вопросы: гистограмма — о форме распределения, сходимость — о стабилизации среднего, log-log график — о законе уменьшения ошибки.</p></div>
+    <div class="grid">
+      <div class="chart-wrap two-thirds"><div class="chart-title"><strong>Гистограмма</strong><span>частота + теоретические распределения</span></div><canvas id="histChart"></canvas><div class="legend"><span class="emp"><i></i>эксперимент</span><span class="pois"><i></i>Пуассон</span><span class="gauss"><i></i>Гаусс</span></div></div>
+      <div class="card third"><h3>Доля в пределах σ</h3><div class="sigma-check" id="sigmaCheck"></div><p class="note">68–95–99.7% — ориентир для нормального распределения, а не обязательное точное совпадение для конечной выборки.</p></div>
+      <div class="chart-wrap half"><div class="chart-title"><strong>Сходимость среднего</strong><span>⟨n⟩ по первым N измерениям</span></div><canvas id="meanChart"></canvas></div>
+      <div class="chart-wrap half"><div class="chart-title"><strong>Ошибка среднего</strong><span>log-log: эксперимент и ~1/√N</span></div><canvas id="errorChart"></canvas><div class="legend"><span class="pois"><i></i>по данным</span><span class="theory"><i></i>1/√N</span></div></div>
+      <div class="card full"><h3>Сравнение нескольких τ</h3><div class="table-scroll"><table class="results"><thead><tr><th>τ, с</th><th>N</th><th>⟨n⟩</th><th>σₙ</th><th>√⟨n⟩</th><th>σ⟨n⟩</th><th>j, с⁻¹</th><th>σj, с⁻¹</th><th>ε</th></tr></thead><tbody id="compareBody"></tbody></table></div></div>
+    </div>
+  </section>
+
+  <section id="simulator">
+    <div class="section-head"><div><div class="kicker">05 · симуляция</div><h2>Поиграйте с распределениями</h2></div><p>Это учебная симуляция, не копия интерфейса лабораторной программы. Параметризация экспоненциального и Парето в конкретном ПО может отличаться.</p></div>
+    <div class="sim-grid">
+      <div class="sim-controls">
+        <div class="field"><label for="dist">Распределение</label><select id="dist"><option value="poisson">Пуассон</option><option value="exponential">Экспоненциальное</option><option value="pareto">Парето</option></select></div>
+        <div class="field"><label for="param">Параметр μ / среднее / α</label><input id="param" type="number" value="10" min="0.1" step="0.1"></div>
+        <div class="field"><label for="simN">Размер выборки N</label><input id="simN" type="number" value="1000" min="10" max="20000" step="10"></div>
+        <div class="field"><label for="groupSize">Суммировать по k значений</label><input id="groupSize" type="number" value="1" min="1" max="100" step="1"></div>
+        <button class="btn primary" id="simulateBtn" type="button">Сгенерировать</button>
+        <div class="status" id="simStatus"></div>
+      </div>
+      <div class="chart-wrap"><div class="chart-title"><strong>Распределение симулированной величины</strong><span id="simCaption"></span></div><canvas id="simChart"></canvas></div>
+    </div>
+  </section>
+
+  <section id="check" class="quiz">
+    <div class="section-head"><div><div class="kicker">06 · самопроверка</div><h2>Перед тем как идти дальше</h2></div></div>
+    <details><summary>Почему при увеличении τ среднее число частиц растёт?</summary><p>Потому что мы наблюдаем один и тот же средний поток более долгое время. Для постоянной интенсивности ожидается ⟨n⟩ = jτ.</p></details>
+    <details><summary>Почему σₙ растёт, хотя относительные флуктуации уменьшаются?</summary><p>Для Пуассона σₙ = √⟨n⟩. Абсолютный разброс растёт как квадратный корень, а отношение σₙ/⟨n⟩ = 1/√⟨n⟩ уменьшается.</p></details>
+    <details><summary>В чём разница между σₙ и σ⟨n⟩?</summary><p>σₙ описывает разброс отдельных измерений, а σ⟨n⟩ = σₙ/√N — неопределённость найденного среднего.</p></details>
+    <details><summary>Зачем нужен log-log график ошибки?</summary><p>Степенной закон σ⟨n⟩ ∝ N⁻¹ᐟ² превращается в прямую с наклоном около −1/2. Так зависимость легче увидеть.</p></details>
+  </section>
+</main>
+<footer><div class="foot-inner"><span><a href="../">← Каталог лабораторных</a></span><span>Лаба 1.1.4 · учебный интерактивный материал</span></div></footer>
+<script src="app.js"></script>
+</body></html>
