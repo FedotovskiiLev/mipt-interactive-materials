@@ -88,16 +88,16 @@
     if (meta?.subject) return meta.subject;
     const p = normalizeText(path);
     const rules = [
-      ['Calculus', ['матан', 'мат анализ', 'математический анализ', 'calculus', 'analysis', 'дифференц', 'интеграл']],
-      ['Linear Algebra & Geometry', ['линал', 'линейная алгебра', 'ангем', 'аналитическая геометрия', 'linear algebra', 'geometry']],
-      ['Physics', ['физика', 'physics', 'механика', 'электричество', 'термодинамика', 'оптика']],
-      ['Chemistry', ['химия', 'chemistry']],
-      ['Programming', ['программирование', 'programming', 'python', 'c++', 'алгоритм']]
+      ['Математический анализ', ['матан', 'мат анализ', 'математический анализ', 'calculus', 'analysis', 'дифференц', 'интеграл']],
+      ['Линейная алгебра и аналитическая геометрия', ['линал', 'линейная алгебра', 'ангем', 'аналитическая геометрия', 'linear algebra', 'geometry']],
+      ['Физика', ['физика', 'physics', 'механика', 'электричество', 'термодинамика', 'оптика']],
+      ['Химия', ['химия', 'chemistry']],
+      ['Программирование', ['программирование', 'programming', 'python', 'c++', 'алгоритм']]
     ];
     for (const [subject, words] of rules) {
       if (words.some(word => p.includes(normalizeText(word)))) return subject;
     }
-    return 'Other';
+    return 'Другое';
   }
 
   function prettyFilename(name) {
@@ -111,7 +111,7 @@
       title: meta?.title || prettyFilename(file.name),
       author: meta?.author || '',
       volume: meta?.volume || '',
-      kind: meta?.kind || 'Book',
+      kind: meta?.kind || 'Книга',
       subject: inferSubject(file.path, meta),
       metadataId: meta?.id || null
     };
@@ -136,7 +136,7 @@
     if (!response.ok) {
       let detail = '';
       try { detail = (await response.json()).message || ''; } catch (_) {}
-      throw new Error(`Yandex Disk API returned ${response.status}${detail ? `: ${detail}` : ''}.`);
+      throw new Error(`Яндекс Диск вернул ошибку ${response.status}.`);
     }
     return response.json();
   }
@@ -176,21 +176,21 @@
     controller = new AbortController();
     refreshBtn.disabled = true;
     scanProgress.classList.add('busy');
-    scanStatus.textContent = 'Scanning public folder…';
+    scanStatus.textContent = 'Читаем публичную папку…';
     catalog.innerHTML = '';
     try {
       const found = [];
       await listDirectory(source, '', 0, controller.signal, found);
       books = found.map(decorateFile).sort((a, b) => a.subject.localeCompare(b.subject) || a.author.localeCompare(b.author) || a.title.localeCompare(b.title));
-      scanStatus.textContent = books.length >= MAX_ITEMS ? `Stopped at ${MAX_ITEMS} files` : 'Up to date';
+      scanStatus.textContent = books.length >= MAX_ITEMS ? `Остановлено после ${MAX_ITEMS} файлов` : 'Обновлено';
       render();
     } catch (error) {
       if (error.name === 'AbortError') return;
-      scanStatus.textContent = 'Could not read library';
+      scanStatus.textContent = 'Не удалось прочитать библиотеку';
       catalog.innerHTML = '';
       const box = document.createElement('div');
       box.className = 'error';
-      box.textContent = `${error.message} The public link is still saved locally; you can retry or change the source.`;
+      box.textContent = `${error.message} Ссылка по-прежнему сохранена только в этом браузере: можно повторить попытку или сменить источник.`;
       catalog.append(box);
     } finally {
       refreshBtn.disabled = false;
@@ -208,10 +208,19 @@
 
   function formatSize(bytes) {
     const n = Number(bytes || 0);
-    if (!n) return 'Size unknown';
-    const units = ['B', 'KB', 'MB', 'GB'];
+    if (!n) return 'Размер неизвестен';
+    const units = ['Б', 'КБ', 'МБ', 'ГБ'];
     const i = Math.min(Math.floor(Math.log(n) / Math.log(1024)), units.length - 1);
     return `${(n / Math.pow(1024, i)).toFixed(i > 1 ? 1 : 0)} ${units[i]}`;
+  }
+
+  function booksWord(n) {
+    const value = Math.abs(Number(n)) % 100;
+    const last = value % 10;
+    if (value > 10 && value < 20) return 'книг';
+    if (last === 1) return 'книга';
+    if (last >= 2 && last <= 4) return 'книги';
+    return 'книг';
   }
 
   function buildViewerUrl(book) {
@@ -229,13 +238,13 @@
   function render() {
     const query = normalizeText(searchInput.value);
     const filtered = books.filter(book => matchesSearch(book, query));
-    bookCount.textContent = `${filtered.length} ${filtered.length === 1 ? 'book' : 'books'}`;
+    bookCount.textContent = `${filtered.length} ${booksWord(filtered.length)}`;
     catalog.innerHTML = '';
     setViewButtons();
     if (!filtered.length) {
       const empty = document.createElement('div');
       empty.className = 'empty';
-      empty.textContent = books.length ? 'No books match this search.' : 'No PDF, DJVU or EPUB books were found in this public folder.';
+      empty.textContent = books.length ? 'По этому запросу ничего не найдено.' : 'В публичной папке не найдено книг в форматах PDF, DJVU или EPUB.';
       catalog.append(empty);
       return;
     }
@@ -249,7 +258,7 @@
       if (!groups.has(book.subject)) groups.set(book.subject, []);
       groups.get(book.subject).push(book);
     }
-    const preferred = ['Calculus', 'Linear Algebra & Geometry', 'Physics', 'Chemistry', 'Programming', 'Other'];
+    const preferred = ['Математический анализ', 'Линейная алгебра и аналитическая геометрия', 'Физика', 'Химия', 'Программирование', 'Другое'];
     const ordered = [...groups.entries()].sort((a, b) => {
       const ai = preferred.indexOf(a[0]); const bi = preferred.indexOf(b[0]);
       return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi) || a[0].localeCompare(b[0]);
@@ -259,7 +268,7 @@
       section.className = 'subject';
       const head = document.createElement('div'); head.className = 'subject-head';
       const h2 = document.createElement('h2'); h2.textContent = subject;
-      const count = document.createElement('span'); count.textContent = `${subjectBooks.length} ${subjectBooks.length === 1 ? 'book' : 'books'}`;
+      const count = document.createElement('span'); count.textContent = `${subjectBooks.length} ${booksWord(subjectBooks.length)}`;
       head.append(h2, count);
       const row = document.createElement('div'); row.className = 'books-row';
       for (const book of subjectBooks) row.append(createBookSpine(book));
@@ -274,7 +283,7 @@
     button.type = 'button'; button.className = 'book';
     button.style.setProperty('--book-color', colorFor(book));
     button.title = [book.title, book.author, book.volume].filter(Boolean).join(' — ');
-    button.setAttribute('aria-label', `Open details for ${book.title}`);
+    button.setAttribute('aria-label', `Открыть сведения о книге «${book.title}»`);
     const spine = document.createElement('span'); spine.className = 'book-spine';
     const title = document.createElement('strong'); title.textContent = book.volume ? `${book.title} · ${book.volume}` : book.title;
     const author = document.createElement('small'); author.textContent = book.author || prettyFilename(book.name);
@@ -290,7 +299,7 @@
     for (const book of items) {
       const button = document.createElement('button'); button.type = 'button'; button.className = 'list-item';
       const title = document.createElement('div'); title.className = 'list-title'; title.textContent = book.volume ? `${book.title} — ${book.volume}` : book.title;
-      const author = document.createElement('div'); author.className = 'list-author'; author.textContent = book.author || 'Unknown author';
+      const author = document.createElement('div'); author.className = 'list-author'; author.textContent = book.author || 'Автор не указан';
       const kind = document.createElement('div'); kind.className = 'list-kind'; kind.textContent = book.subject;
       const path = document.createElement('div'); path.className = 'list-path'; path.textContent = book.path;
       button.append(title, author, kind, path);
@@ -309,7 +318,7 @@
     document.getElementById('coverVolume').textContent = book.volume || book.kind;
     document.getElementById('detailSubject').textContent = book.subject;
     document.getElementById('detailTitle').textContent = book.volume ? `${book.title} — ${book.volume}` : book.title;
-    document.getElementById('detailAuthor').textContent = book.author || 'Author not identified';
+    document.getElementById('detailAuthor').textContent = book.author || 'Автор не определён';
     document.getElementById('detailKind').textContent = book.kind;
     document.getElementById('detailSize').textContent = formatSize(book.size);
     document.getElementById('detailPath').textContent = book.path;
@@ -354,7 +363,7 @@
     event.preventDefault();
     const value = sourceInput.value.trim();
     if (!isYandexPublicUrl(value)) {
-      setupError.textContent = 'Please paste a public Yandex Disk link (disk.yandex.ru/d/… or disk.yandex.ru/i/…).';
+      setupError.textContent = 'Вставьте публичную ссылку Яндекс Диска вида disk.yandex.ru/d/… или disk.yandex.ru/i/…';
       setupError.hidden = false;
       return;
     }
@@ -367,7 +376,7 @@
   listBtn.addEventListener('click', () => setView('list'));
   refreshBtn.addEventListener('click', scanLibrary);
   changeBtn.addEventListener('click', () => {
-    const forget = confirm('Forget the saved library link on this device?\n\nOK = forget it. Cancel = keep it and return to the connection screen.');
+    const forget = confirm('Удалить сохранённую ссылку на библиотеку с этого устройства?\n\n«ОК» — удалить ссылку. «Отмена» — сохранить её и вернуться к экрану подключения.');
     returnToSetup(forget);
   });
   document.getElementById('closeDialog').addEventListener('click', () => dialog.close());
@@ -380,7 +389,7 @@
     const button = event.currentTarget;
     try {
       await navigator.clipboard.writeText(selectedBook.name);
-      const old = button.textContent; button.textContent = 'Copied'; setTimeout(() => { button.textContent = old; }, 1200);
+      const old = button.textContent; button.textContent = 'Скопировано'; setTimeout(() => { button.textContent = old; }, 1200);
     } catch (_) {
       button.textContent = selectedBook.name;
     }

@@ -1,50 +1,47 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="A local-first visual bookshelf for public Yandex Disk libraries.">
-  <title>Bookshelf — MIPT Study Tools</title>
+  <meta name="description" content="Визуальная книжная полка для публичных библиотек на Яндекс Диске.">
+  <title>Библиотека — Интерактивные материалы МФТИ</title>
   <link rel="stylesheet" href="../assets/site.css"><link rel="stylesheet" href="bookshelf.css">
 </head>
 <body>
-<header class="site-header"><nav class="site-nav"><a class="brand" href="../">MIPT Study Tools</a><div class="nav-links"><a href="../physics/">Physics</a><a aria-current="page" href="./">Bookshelf</a></div></nav></header>
+<header class="site-header"><nav class="site-nav" aria-label="Основная навигация"><a class="brand" href="../">Интерактивные материалы МФТИ</a><div class="nav-links"><a href="../physics/">Физика</a><a aria-current="page" href="./">Библиотека</a></div></nav></header>
 <main class="books-page">
-  <section class="books-intro"><div><div class="kicker">Personal library view</div><h1>Bookshelf</h1><p>Turn a public Yandex Disk folder into a searchable bookshelf. The library URL is stored only in this browser and is never part of the repository.</p></div></section>
-
+  <section class="books-intro"><div><div class="kicker">Личная учебная библиотека</div><h1>Книжная полка</h1><p>Превратите публичную папку Яндекс Диска в удобную библиотеку с поиском. Ссылка на источник хранится только в этом браузере и не попадает в репозиторий.</p></div></section>
   <section class="setup" id="setup">
-    <div class="kicker">Connect a source</div><h2>Paste a public library link</h2>
-    <p class="muted">Use a public Yandex Disk folder URL such as <code>https://disk.yandex.ru/d/...</code>. The site only reads public metadata.</p>
+    <div class="kicker">Подключение библиотеки</div><h2>Вставьте публичную ссылку</h2>
+    <p class="muted">Подойдёт публичная ссылка на папку Яндекс Диска вида <code>https://disk.yandex.ru/d/...</code>. Сайт читает только общедоступные сведения о файлах.</p>
     <form class="setup-form" id="connectForm">
-      <label class="sr-only" for="sourceInput">Public Yandex Disk folder link</label>
+      <label class="sr-only" for="sourceInput">Публичная ссылка на папку Яндекс Диска</label>
       <input id="sourceInput" type="url" inputmode="url" autocomplete="off" placeholder="https://disk.yandex.ru/d/..." required>
-      <button class="btn primary" type="submit">Connect library</button>
+      <button class="btn primary" type="submit">Подключить библиотеку</button>
     </form>
-    <div class="hint">Saved locally on this device via <code>localStorage</code>. No account, token or server is used.</div>
+    <div class="hint">Ссылка сохраняется только на этом устройстве через <code>localStorage</code>. Аккаунт, токен и сервер не нужны.</div>
     <div class="error" id="setupError" role="alert" hidden></div>
   </section>
-
   <section class="library" id="library" hidden>
     <div class="toolbar">
-      <div class="search-wrap"><label class="sr-only" for="searchInput">Search books</label><input id="searchInput" type="search" placeholder="Search title, author, filename or subject…"></div>
-      <div class="toggle" aria-label="View mode"><button id="shelfBtn" type="button" aria-pressed="true">Shelf</button><button id="listBtn" type="button" aria-pressed="false">List</button></div>
-      <button class="btn" id="refreshBtn" type="button">Refresh</button>
-      <button class="btn quiet" id="changeBtn" type="button">Change source</button>
+      <div class="search-wrap"><label class="sr-only" for="searchInput">Поиск книг</label><input id="searchInput" type="search" placeholder="Название, автор, имя файла или предмет…"></div>
+      <div class="toggle" aria-label="Режим отображения"><button id="shelfBtn" type="button" aria-pressed="true">Полки</button><button id="listBtn" type="button" aria-pressed="false">Список</button></div>
+      <button class="btn" id="refreshBtn" type="button">Обновить</button>
+      <button class="btn quiet" id="changeBtn" type="button">Сменить источник</button>
     </div>
-    <div class="library-meta"><strong id="bookCount">0 books</strong><span class="dot"></span><span class="source-name" id="sourceName"></span><span class="dot"></span><span id="scanStatus">Ready</span></div>
+    <div class="library-meta"><strong id="bookCount">0 книг</strong><span class="dot"></span><span class="source-name" id="sourceName"></span><span class="dot"></span><span id="scanStatus">Готово</span></div>
     <div class="scan-progress" id="scanProgress" aria-hidden="true"><span></span></div>
     <div id="catalog" aria-live="polite"></div>
   </section>
 </main>
-
 <dialog id="bookDialog">
   <div class="book-dialog">
     <div class="cover-wrap"><div class="cover" id="dialogCover"><div class="cover-author" id="coverAuthor"></div><div class="cover-title" id="coverTitle"></div><div class="cover-volume" id="coverVolume"></div></div></div>
     <div class="dialog-content">
-      <div class="dialog-top"><div><div class="kicker" id="detailSubject"></div><h2 id="detailTitle"></h2><div class="detail-author" id="detailAuthor"></div></div><button class="close" id="closeDialog" type="button" aria-label="Close">×</button></div>
+      <div class="dialog-top"><div><div class="kicker" id="detailSubject"></div><h2 id="detailTitle"></h2><div class="detail-author" id="detailAuthor"></div></div><button class="close" id="closeDialog" type="button" aria-label="Закрыть">×</button></div>
       <div class="chips"><span class="chip" id="detailKind"></span><span class="chip" id="detailSize"></span></div>
       <div class="file-path" id="detailPath"></div>
-      <div class="dialog-actions"><a class="btn primary" id="openBook" target="_blank" rel="noopener">Open book</a><button class="btn" id="copyName" type="button">Copy filename</button></div>
-      <div class="privacy-note">“Open book” uses Yandex Disk’s public viewer. The PDF itself is not stored by this site.</div>
+      <div class="dialog-actions"><a class="btn primary" id="openBook" target="_blank" rel="noopener">Открыть книгу</a><button class="btn" id="copyName" type="button">Скопировать имя файла</button></div>
+      <div class="privacy-note">Кнопка «Открыть книгу» использует публичный просмотр Яндекс Диска. Сам файл на этом сайте не хранится.</div>
     </div>
   </div>
 </dialog>

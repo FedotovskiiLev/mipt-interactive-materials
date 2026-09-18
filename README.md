@@ -1,47 +1,29 @@
-# MIPT Study Tools
+# Интерактивные материалы МФТИ
 
-A growing collection of lightweight interactive study materials for MIPT courses.
+Набор небольших интерактивных учебных материалов по университетской математике, физике и лабораторным работам.
 
-The repository still uses its original GitHub repository name for compatibility, but the site itself is now organized as a broader study project rather than a physics-labs-only collection.
+Репозиторий пока сохраняет исходное имя `mipt-physics-labs`, чтобы не менять существующую публичную ссылку, однако внутренняя структура уже рассчитана на более широкий учебный проект.
 
-## Current sections
+## Разделы
 
-### Physics
+### Физика
 
-Interactive material for physics courses and laboratory work.
+Интерактивные материалы по курсу физики и лабораторному практикуму.
 
-Currently available:
+Сейчас доступна лабораторная **1.1.4 — «Статистика космического фона»**. На странице есть обработка экспериментальных данных, группировка по времени, расчёт статистических величин, сравнение с распределением Пуассона и приближением Гаусса, графики и учебный симулятор.
 
-- **Lab 1.1.4 — Statistics of cosmic-ray background**
-  - experimental data parser;
-  - grouping measurements by time interval;
-  - mean, variance, standard deviation and uncertainty of the mean;
-  - counting-rate calculation;
-  - Poisson and Gaussian comparison;
-  - convergence and log-log uncertainty plots;
-  - comparison of multiple time intervals;
-  - educational distribution simulator.
+### Библиотека
 
-### Bookshelf
+Визуальная книжная полка для публичных библиотек на Яндекс Диске.
 
-A local-first visual interface for public Yandex Disk libraries.
+Сам проект **не хранит книги и не содержит заранее заданной ссылки на чужой диск**. Пользователь самостоятельно вставляет публичную ссылку на папку. Она сохраняется только в его браузере через `localStorage` и не отправляется в репозиторий.
 
-The bookshelf does **not** contain or host the books themselves. A user provides a public Yandex Disk folder URL in the browser. That URL is saved locally using `localStorage` and is never stored in this repository.
+Библиотека умеет находить PDF, DJVU и EPUB, распределять распознанные книги по предметам, дополнять известные издания статическими метаданными, показывать книги на полках или списком, искать по каталогу и открывать выбранный файл через публичный просмотр Яндекс Диска.
 
-The bookshelf:
-
-- scans the public folder through the public Yandex Disk API;
-- finds PDF, DJVU and EPUB files;
-- groups recognized books by subject;
-- enriches known titles using static metadata from this repository;
-- provides shelf and list views;
-- supports local search;
-- opens a selected file through the Yandex Disk public viewer.
-
-## Structure
+## Структура
 
 ```text
-.
+mipt-physics-labs/
 ├── index.html
 ├── assets/
 │   └── site.css
@@ -63,20 +45,20 @@ The bookshelf:
     └── index.html
 ```
 
-`lab-1.1.4/` is a compatibility redirect for the previous page location.
+`lab-1.1.4/` оставлен как совместимый адрес и перенаправляет на новую страницу `physics/labs/1.1.4/`.
 
-## Design principles
+## Принципы проекта
 
-- Fully static: HTML, CSS and vanilla JavaScript only.
-- No backend, database, API secrets or build step.
-- Educational tools should explain the underlying idea rather than automatically generate finished coursework.
-- Subject areas remain independent and lightweight while sharing common navigation and styling.
-- External books and source material are linked or read from user-provided public sources rather than committed as large binary files.
+- Полностью статический сайт: HTML, CSS и обычный JavaScript.
+- Никакого собственного сервера, базы данных, секретных ключей и обязательной сборки.
+- Интерактивные материалы должны объяснять идею и помогать разобраться, а не автоматически выдавать готовую учебную работу.
+- Разделы по разным предметам остаются самостоятельными, но используют общую навигацию и оформление.
+- Большие внешние материалы, например книги, не добавляются в Git-репозиторий: сайт работает со ссылками или публичными источниками, которые подключает сам пользователь.
 
-## Planned areas
+## В планах
 
-The structure is intended to expand with interactive materials for calculus, linear algebra, analytic geometry, general physics and additional laboratory work.
+Постепенное добавление интерактивных материалов по математическому анализу, линейной алгебре, аналитической геометрии, общей физике и другим лабораторным работам.
 
-## License
+## Лицензия
 
-No open-source license has been selected yet.
+Лицензия проекта пока не выбрана.

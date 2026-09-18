@@ -1,5 +1,5 @@
-# Synthetic example for the interactive page
-# One count per 1 s interval
+# Искусственный пример данных для интерактивной страницы
+# Одно значение на каждый интервал длительностью 1 с
 0
 0
 1
