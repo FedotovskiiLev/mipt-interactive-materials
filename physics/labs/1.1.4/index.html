@@ -1,98 +1,311 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Интерактивный учебный помощник к лабораторной работе 1.1.4 по статистике космического фона.">
-  <title>Лаба 1.1.4 — Статистика космического фона</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Интерактивный учебный материал к лабораторной работе 1.1.4: статистические закономерности на примере фона космического излучения.">
+  <title>1.1.4 — Статистика космического фона</title>
+  <link rel="stylesheet" href="styles.css?v=0.10">
 </head>
 <body>
-<header class="top"><div class="top-inner"><a class="home" href="../../../">Интерактивные материалы МФТИ</a><nav class="top-nav"><a href="#theory">Теория</a><a href="#analyzer">Данные</a><a href="#graphs">Графики</a><a href="#simulator">Симулятор</a><a href="#check">Самопроверка</a></nav></div></header>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="../../../">Интерактивные материалы МФТИ</a>
+    <nav class="topnav" aria-label="Навигация по работе">
+      <a href="#measure">Измерение</a>
+      <a href="#statistics">Статистика</a>
+      <a href="#poisson">Пуассон</a>
+      <a href="#grouping">Группировка</a>
+      <a href="#analyzer">Свои данные</a>
+      <a href="#program">Программа</a>
+    </nav>
+  </div>
+</header>
+
 <main>
   <section class="hero">
-    <div><div class="kicker">Физика · лабораторная 1.1.4</div><h1>Статистика космического фона</h1><p class="lead">Интерактивный помощник к работе о случайном потоке частиц: распределение Пуассона, приближение Гаусса, группировка по времени и погрешность среднего.</p></div>
-    <aside class="hero-card"><strong>Что здесь можно сделать</strong><p>Загрузить собственный файл измерений, менять интервал τ, смотреть статистики и графики, сравнивать несколько τ и отдельно исследовать распределения на симуляции.</p></aside>
-  </section>
-
-  <section id="theory">
-    <div class="section-head"><div><div class="kicker">01 · смысл работы</div><h2>Минимум теории</h2></div><p>Счётчик Гейгера–Мюллера регистрирует отдельные события. Если поток стационарен, а события независимы, число регистраций за фиксированный интервал описывается законом Пуассона.</p></div>
-    <div class="grid">
-      <article class="card half"><h3>Среднее число событий</h3><div class="formula">⟨n⟩ = (1/N) Σ nᵢ</div><p>Это оценка среднего числа зарегистрированных частиц за выбранный интервал времени τ.</p></article>
-      <article class="card half"><h3>Разброс измерений</h3><div class="formula">σₙ² = (1/N) Σ (nᵢ − ⟨n⟩)²</div><p>В этой методичке дисперсия выборки определяется именно с делением на N. Для идеального пуассоновского потока ожидается σₙ ≈ √⟨n⟩.</p></article>
-      <article class="card third"><h3>Ошибка среднего</h3><div class="formula">σ⟨n⟩ = σₙ / √N</div><p>Чем больше независимых интервалов мы измерили, тем точнее знаем среднее.</p></article>
-      <article class="card third"><h3>Интенсивность</h3><div class="formula">j = ⟨n⟩ / τ</div><p>Она позволяет сравнивать серии с разным временем накопления.</p></article>
-      <article class="card third"><h3>Относительная ошибка</h3><div class="formula">ε = 1 / √nΣ</div><p>Для пуассоновского процесса nΣ = Σnᵢ. Чтобы получить примерно 1%, нужно порядка 10⁴ зарегистрированных событий.</p></article>
-      <article class="card full"><h3>Пуассон → Гаусс</h3><p>Вероятность получить ровно n событий при среднем μ равна <strong>P(n)=μⁿe⁻ᵘ/n!</strong>. При достаточно большом μ распределение становится близким к нормальному. Для нормального распределения примерно 68%, 95% и 99.7% значений лежат внутри ±σ, ±2σ и ±3σ.</p><p class="note">Здесь нормальная кривая на дискретной гистограмме считается с поправкой на непрерывность: сравнивается вероятность попасть в интервал [n−0.5, n+0.5].</p></article>
-    </div>
-  </section>
-
-  <section>
-    <div class="section-head"><div><div class="kicker">02 · ход мысли</div><h2>Что делать в эксперименте</h2></div></div>
-    <div class="card steps">
-      <div class="step"><div><strong>Получить длинную серию отсчётов.</strong><p>В современной версии работы обычно записывается около 4000 значений с базовым интервалом τ₀ = 1 с.</p></div></div>
-      <div class="step"><div><strong>Посмотреть на исходные данные.</strong><p>Найти ⟨n⟩, σₙ и σ⟨n⟩. Сравнить σₙ с √⟨n⟩.</p></div></div>
-      <div class="step"><div><strong>Сгруппировать соседние отсчёты.</strong><p>Например, для τ = 10 с сложить каждые десять последовательных значений. Для τ = 40 с — каждые сорок.</p></div></div>
-      <div class="step"><div><strong>Сравнить гистограммы.</strong><p>При росте τ растёт среднее число событий и пуассоновское распределение становится всё более похожим на гауссово.</p></div></div>
-      <div class="step"><div><strong>Проверить погрешность.</strong><p>Ошибка среднего должна уменьшаться приблизительно как 1/√N.</p></div></div>
-    </div>
-  </section>
-
-  <section id="analyzer">
-    <div class="section-head"><div><div class="kicker">03 · свои данные</div><h2>Анализатор</h2></div><p>Файл лабораторной программы может содержать строки-комментарии, начинающиеся с #. Они игнорируются.</p></div>
-    <div class="grid">
-      <div class="card half">
-        <h3>1. Загрузите файл или вставьте данные</h3>
-        <div class="drop"><input id="fileInput" type="file" accept=".txt,.dat,.csv,text/plain"><div class="status">или вставьте значения ниже</div></div>
-        <div class="field" style="margin-top:10px"><label for="dataText">Одно значение на строку или числа, разделённые пробелами</label><textarea id="dataText" spellcheck="false" placeholder="# комментарий&#10;1&#10;2&#10;1&#10;0"></textarea></div>
-        <div class="actions"><button class="btn primary" id="analyzeBtn" type="button">Анализировать</button><button class="btn" id="sampleBtn" type="button">Загрузить пример</button></div>
-        <div class="status" id="dataStatus">Данные ещё не загружены.</div>
+    <div class="hero-main">
+      <div class="eyebrow">Физика · лабораторная 1.1.4</div>
+      <h1>Статистика космического фона</h1>
+      <p class="hero-lead">Не набор формул, а маршрут по работе: что именно считает установка, откуда берутся среднее и разброс, как появляется гистограмма, почему здесь нужен закон Пуассона и что меняется при группировке измерений.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#measure">Начать с измерения</a>
+        <a class="button" href="#analyzer">У меня уже есть данные</a>
       </div>
-      <div class="card half">
-        <h3>2. Выберите интервал</h3>
-        <div class="controls">
-          <div class="field"><label for="baseTau">Базовый τ₀, с</label><input id="baseTau" type="number" min="0.001" step="any" value="1"></div>
-          <div class="field"><label for="tau">Анализируемый τ, с</label><input id="tau" type="number" min="0.001" step="any" value="10"></div>
-          <div class="field" style="grid-column:span 2"><label for="tauList">Сравнить интервалы, с</label><input id="tauList" type="text" value="1, 10, 20, 40, 80"></div>
+    </div>
+    <aside class="hero-principle">
+      <div class="principle-title">Понять, увидев в действии</div>
+      <p>Каждое определение ниже связано с небольшим интерактивом. Сначала меняем величины и смотрим, что происходит, затем читаем формулу.</p>
+      <div class="source-badge">Основа страницы — предоставленная методичка 1.1.4</div>
+    </aside>
+  </section>
+
+  <section class="route" aria-label="Маршрут по работе">
+    <a href="#measure"><b>1</b><span>Что измеряется</span></a>
+    <a href="#statistics"><b>2</b><span>Как описать серию</span></a>
+    <a href="#histogram"><b>3</b><span>Как читать гистограмму</span></a>
+    <a href="#poisson"><b>4</b><span>Что предсказывает Пуассон</span></a>
+    <a href="#grouping"><b>5</b><span>Зачем менять τ</span></a>
+    <a href="#error"><b>6</b><span>Откуда берётся ошибка</span></a>
+    <a href="#analyzer"><b>7</b><span>Применить к своим данным</span></a>
+  </section>
+
+  <section id="measure" class="lesson-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">01 · измерение</div><h2>Что на самом деле записывает установка</h2></div>
+      <p>Счётчик Гейгера–Мюллера регистрирует отдельные импульсы. Программа считает, сколько импульсов попало в каждый интервал времени.</p>
+    </div>
+
+    <div class="split-card measurement-card">
+      <div class="explain">
+        <div class="method-label">Из методички</div>
+        <p>В основном эксперименте данные записываются с базовым интервалом <b>τ₀ = 1 с</b>. При времени измерения около <b>4000 с</b> получается около <b>4000 отсчётов</b>.</p>
+        <div class="formula-block"><span>nᵢ</span><small>число регистраций в i-м интервале</small></div>
+        <p class="meaning">Последовательность <b>n₁, n₂, …, nᴺ</b> — это исходный материал всей дальнейшей статистики.</p>
+      </div>
+      <div class="interactive-panel">
+        <div class="panel-head"><strong>Схематический счётчик</strong><span>масштаб условный</span></div>
+        <div class="segmented" id="measureTauButtons" aria-label="Длительность интервала в схеме">
+          <button class="active" data-tau="1" type="button">τ = 1</button>
+          <button data-tau="2" type="button">τ = 2</button>
+          <button data-tau="4" type="button">τ = 4</button>
         </div>
-        <div class="stats" id="stats"></div>
+        <div class="pulse-timeline" id="pulseTimeline" aria-label="Схема регистраций во времени"></div>
+        <div class="count-strip" id="countStrip"></div>
+        <p class="interactive-caption" id="measureCaption"></p>
       </div>
     </div>
   </section>
 
-  <section id="graphs">
-    <div class="section-head"><div><div class="kicker">04 · визуализация</div><h2>Что показывают разные графики</h2></div><p>Они отвечают на разные вопросы: гистограмма — о форме распределения, сходимость — о стабилизации среднего, log-log график — о законе уменьшения ошибки.</p></div>
-    <div class="grid">
-      <div class="chart-wrap two-thirds"><div class="chart-title"><strong>Гистограмма</strong><span>частота + теоретические распределения</span></div><canvas id="histChart"></canvas><div class="legend"><span class="emp"><i></i>эксперимент</span><span class="pois"><i></i>Пуассон</span><span class="gauss"><i></i>Гаусс</span></div></div>
-      <div class="card third"><h3>Доля в пределах σ</h3><div class="sigma-check" id="sigmaCheck"></div><p class="note">68–95–99.7% — ориентир для нормального распределения, а не обязательное точное совпадение для конечной выборки.</p></div>
-      <div class="chart-wrap half"><div class="chart-title"><strong>Сходимость среднего</strong><span>⟨n⟩ по первым N измерениям</span></div><canvas id="meanChart"></canvas></div>
-      <div class="chart-wrap half"><div class="chart-title"><strong>Ошибка среднего</strong><span>log-log: эксперимент и ~1/√N</span></div><canvas id="errorChart"></canvas><div class="legend"><span class="pois"><i></i>по данным</span><span class="theory"><i></i>1/√N</span></div></div>
-      <div class="card full"><h3>Сравнение нескольких τ</h3><div class="table-scroll"><table class="results"><thead><tr><th>τ, с</th><th>N</th><th>⟨n⟩</th><th>σₙ</th><th>√⟨n⟩</th><th>σ⟨n⟩</th><th>j, с⁻¹</th><th>σj, с⁻¹</th><th>ε</th></tr></thead><tbody id="compareBody"></tbody></table></div></div>
+  <section id="statistics" class="lesson-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">02 · серия измерений</div><h2>Среднее, разброс и ошибка — это разные вещи</h2></div>
+      <p>Их легко спутать, если просто выучить три формулы. Здесь можно пройти вычисление по шагам на одной небольшой серии.</p>
     </div>
-  </section>
 
-  <section id="simulator">
-    <div class="section-head"><div><div class="kicker">05 · симуляция</div><h2>Поиграйте с распределениями</h2></div><p>Это учебная симуляция, не копия интерфейса лабораторной программы. Параметризация экспоненциального и Парето в конкретном ПО может отличаться.</p></div>
-    <div class="sim-grid">
-      <div class="sim-controls">
-        <div class="field"><label for="dist">Распределение</label><select id="dist"><option value="poisson">Пуассон</option><option value="exponential">Экспоненциальное</option><option value="pareto">Парето</option></select></div>
-        <div class="field"><label for="param">Параметр μ / среднее / α</label><input id="param" type="number" value="10" min="0.1" step="0.1"></div>
-        <div class="field"><label for="simN">Размер выборки N</label><input id="simN" type="number" value="1000" min="10" max="20000" step="10"></div>
-        <div class="field"><label for="groupSize">Суммировать по k значений</label><input id="groupSize" type="number" value="1" min="1" max="100" step="1"></div>
-        <button class="btn primary" id="simulateBtn" type="button">Сгенерировать</button>
-        <div class="status" id="simStatus"></div>
+    <div class="statistics-lab">
+      <div class="mini-data-card">
+        <div class="panel-head"><strong>Учебная серия nᵢ</strong><span>значения можно менять</span></div>
+        <div class="editable-counts" id="editableCounts"></div>
+        <button class="text-button" id="resetMiniData" type="button">Вернуть исходный пример</button>
       </div>
-      <div class="chart-wrap"><div class="chart-title"><strong>Распределение симулированной величины</strong><span id="simCaption"></span></div><canvas id="simChart"></canvas></div>
+
+      <div class="stepper-card">
+        <div class="stat-step-tabs" role="tablist" aria-label="Шаг вычисления статистики">
+          <button class="active" data-step="mean" type="button"><span>1</span> Среднее</button>
+          <button data-step="variance" type="button"><span>2</span> Дисперсия</button>
+          <button data-step="sigma" type="button"><span>3</span> σₙ</button>
+          <button data-step="sem" type="button"><span>4</span> Ошибка среднего</button>
+        </div>
+        <div id="statStepContent" class="stat-step-content"></div>
+      </div>
+    </div>
+
+    <div class="concept-row">
+      <article>
+        <div class="concept-symbol">σₙ</div>
+        <h3>Разброс отдельных отсчётов</h3>
+        <p>Показывает, насколько сильно отдельные nᵢ расходятся со средним ⟨n⟩.</p>
+      </article>
+      <article>
+        <div class="concept-symbol">σ⟨n⟩</div>
+        <h3>Ошибка найденного среднего</h3>
+        <p>Показывает неопределённость среднего и уменьшается как σₙ/√N.</p>
+      </article>
+      <article>
+        <div class="concept-symbol">j</div>
+        <h3>Средняя интенсивность</h3>
+        <p>Для интервала τ: <b>j = ⟨n⟩/τ</b>. Именно она позволяет сравнивать результаты при разных τ.</p>
+      </article>
     </div>
   </section>
 
-  <section id="check" class="quiz">
-    <div class="section-head"><div><div class="kicker">06 · самопроверка</div><h2>Перед тем как идти дальше</h2></div></div>
-    <details><summary>Почему при увеличении τ среднее число частиц растёт?</summary><p>Потому что мы наблюдаем один и тот же средний поток более долгое время. Для постоянной интенсивности ожидается ⟨n⟩ = jτ.</p></details>
-    <details><summary>Почему σₙ растёт, хотя относительные флуктуации уменьшаются?</summary><p>Для Пуассона σₙ = √⟨n⟩. Абсолютный разброс растёт как квадратный корень, а отношение σₙ/⟨n⟩ = 1/√⟨n⟩ уменьшается.</p></details>
-    <details><summary>В чём разница между σₙ и σ⟨n⟩?</summary><p>σₙ описывает разброс отдельных измерений, а σ⟨n⟩ = σₙ/√N — неопределённость найденного среднего.</p></details>
-    <details><summary>Зачем нужен log-log график ошибки?</summary><p>Степенной закон σ⟨n⟩ ∝ N⁻¹ᐟ² превращается в прямую с наклоном около −1/2. Так зависимость легче увидеть.</p></details>
+  <section id="histogram" class="lesson-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">03 · гистограмма</div><h2>Гистограмма отвечает: «как часто встречалось каждое n?»</h2></div>
+      <p>Она строится не из среднего и не из σ. Для каждого значения n отдельно считаем, сколько раз оно встретилось.</p>
+    </div>
+
+    <div class="split-card histogram-lesson">
+      <div class="explain">
+        <div class="formula-stack">
+          <div class="formula-block"><span>Nₙ</span><small>сколько раз встретилось значение n</small></div>
+          <div class="formula-block"><span>wₙ = Nₙ / N</span><small>экспериментальная частота этого значения</small></div>
+        </div>
+        <p>Нажмите на любой столбец. Сайт покажет, из каких чисел получилась его высота.</p>
+        <div class="hist-info" id="histInfo">Выберите столбец на гистограмме.</div>
+      </div>
+      <div class="interactive-panel">
+        <div class="panel-head"><strong>Учебная выборка</strong><span>не экспериментальные данные</span></div>
+        <div class="segmented" id="histNButtons">
+          <button class="active" data-n="20" type="button">N = 20</button>
+          <button data-n="50" type="button">N = 50</button>
+          <button data-n="100" type="button">N = 100</button>
+        </div>
+        <div class="bar-histogram" id="frequencyHistogram" aria-label="Экспериментальные частоты учебной выборки"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="poisson" class="lesson-section accent-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">04 · закон Пуассона</div><h2>Теперь вместо «что получилось» спрашиваем «что ожидается»</h2></div>
+      <p>Для среднего числа событий n̄ методичка задаёт вероятность получить ровно n регистраций законом Пуассона.</p>
+    </div>
+
+    <div class="poisson-layout">
+      <div class="poisson-controls cardish">
+        <label for="poissonMean">Среднее n̄</label>
+        <input id="poissonMean" type="range" min="1" max="30" step="1" value="6">
+        <div class="range-readout"><strong id="poissonMeanValue">6</strong><span>σ = √n̄ = <b id="poissonSigmaValue"></b></span></div>
+
+        <label for="poissonK">Какое n проверяем?</label>
+        <input id="poissonK" type="range" min="0" max="18" step="1" value="6">
+        <div class="range-readout"><strong id="poissonKValue">6</strong><span id="poissonProbValue"></span></div>
+
+        <div class="formula-large">wₙ = <span class="fraction"><span>n̄ⁿ</span><span>n!</span></span> e<sup>−n̄</sup></div>
+        <div class="numeric-formula" id="poissonNumeric"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-head"><div><strong>Теоретическое распределение</strong><span>наведите или нажмите на столбец</span></div><label class="switch"><input id="gaussToggle" type="checkbox"><span></span> Гаусс</label></div>
+        <canvas id="poissonChart"></canvas>
+        <div class="chart-note" id="gaussNote">В методичке отмечено: при достаточно большом среднем (практически n̄ ≳ 10) распределение Пуассона приближается к гауссову.</div>
+      </div>
+    </div>
+
+    <div class="poisson-property">
+      <div><span class="property-sign">σ = √n̄</span><p>Это ключевое свойство Пуассона, которое в работе проверяется экспериментально сравнением σₙ и √⟨n⟩.</p></div>
+      <div class="sigma-ranges">
+        <div><b>≈ 68%</b><span>в пределах ±σ</span></div>
+        <div><b>≈ 95%</b><span>в пределах ±2σ</span></div>
+        <div><b>≈ 99,7%</b><span>в пределах ±3σ</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="grouping" class="lesson-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">05 · группировка</div><h2>Увеличить τ — значит сложить соседние отсчёты</h2></div>
+      <p>Никакой новой информации в данные не добавляется. Мы просто меняем длину интервала, за который считаем регистрации.</p>
+    </div>
+
+    <div class="grouping-demo">
+      <div class="grouping-controls">
+        <div class="segmented" id="groupTauButtons">
+          <button class="active" data-k="1" type="button">τ = 1 с</button>
+          <button data-k="10" type="button">10 с</button>
+          <button data-k="20" type="button">20 с</button>
+          <button data-k="40" type="button">40 с</button>
+          <button data-k="80" type="button">80 с</button>
+        </div>
+        <p class="source-note">В методичке встречаются примеры τ = 1, 10, 20, 80 с и, в разделе обработки, например 10, 20, 40, 80 с. Поэтому ниже список τ не зашит жёстко.</p>
+      </div>
+      <div class="grouping-visual" id="groupingVisual"></div>
+      <div class="grouping-summary" id="groupingSummary"></div>
+    </div>
+  </section>
+
+  <section id="error" class="lesson-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">06 · погрешность</div><h2>Главное число — сколько событий вы вообще зарегистрировали</h2></div>
+      <p>Для пуассоновского процесса формулы методички сводят относительную ошибку среднего к общему числу зарегистрированных частиц nΣ.</p>
+    </div>
+
+    <div class="error-lab">
+      <div class="error-formulas">
+        <div class="formula-line">σ⟨n⟩ = σₙ / √N = √(⟨n⟩ / N)</div>
+        <div class="formula-line emphasis">ε⟨n⟩ = 1 / √(⟨n⟩N) = 1 / √nΣ</div>
+        <div class="meaning-box"><b>nΣ = Σnᵢ = ⟨n⟩N</b><span>общее число зарегистрированных событий</span></div>
+      </div>
+      <div class="error-interactive cardish">
+        <label for="totalEvents">Общее число событий nΣ</label>
+        <input id="totalEvents" type="range" min="100" max="20000" step="100" value="10000">
+        <div class="error-readout"><strong id="totalEventsValue">10000</strong><span>ε = <b id="relativeErrorValue">1,00%</b></span></div>
+        <div class="error-scale"><span>100</span><i></i><span class="one-percent">10⁴ → около 1%</span><i></i><span>20000</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="workflow" class="lesson-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">07 · маршрут лабораторной</div><h2>Что именно нужно исследовать</h2></div>
+      <p>Это не «универсальный план статистики», а последовательность, собранная по вашей методичке.</p>
+    </div>
+
+    <div class="workflow-tabs" id="workflowTabs">
+      <button class="active" data-work="experiment" type="button"><b>1</b> Основной эксперимент</button>
+      <button data-work="n-growth" type="button"><b>2</b> Рост N</button>
+      <button data-work="tau" type="button"><b>3</b> Несколько τ</button>
+      <button data-work="simulation" type="button"><b>4</b> Симуляция в программе</button>
+    </div>
+    <div class="workflow-content" id="workflowContent"></div>
+  </section>
+
+  <section id="analyzer" class="lesson-section analyzer-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">08 · ваши данные</div><h2>Теперь применяем всё к файлу эксперимента</h2></div>
+      <p>Комментарии, начинающиеся с <code>#</code>, игнорируются. В расчётах используется определение дисперсии из методички — с делением на N.</p>
+    </div>
+
+    <div class="data-loader">
+      <div class="loader-left">
+        <label class="file-drop" for="fileInput"><input id="fileInput" type="file" accept=".txt,.dat,.csv,text/plain"><strong>Выбрать файл</strong><span>или перетащить/вставить данные ниже</span></label>
+        <textarea id="dataText" spellcheck="false" placeholder="# комментарий&#10;4&#10;3&#10;6&#10;..."></textarea>
+        <div class="loader-actions"><button class="button primary" id="analyzeBtn" type="button">Разобрать данные</button><button class="button" id="sampleBtn" type="button">Учебный пример</button></div>
+        <div class="data-status" id="dataStatus">Данные ещё не загружены.</div>
+      </div>
+      <div class="loader-right">
+        <label>Базовый интервал τ₀, с<input id="baseTau" type="number" min="0.001" step="any" value="1"></label>
+        <label>Текущий интервал τ, с<input id="tau" type="number" min="0.001" step="any" value="10"></label>
+        <label>Интервалы для сравнения<input id="tauList" type="text" value="1, 10, 20, 40, 80"></label>
+        <p>τ должен быть целым кратным τ₀. Неполная последняя группа не используется.</p>
+      </div>
+    </div>
+
+    <div id="analysisDashboard" class="analysis-dashboard empty-dashboard">
+      <div class="dashboard-placeholder"><strong>Загрузите данные</strong><span>После этого здесь появятся статистики, графики и сравнение интервалов.</span></div>
+    </div>
+  </section>
+
+  <section id="program" class="lesson-section program-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">09 · симуляция в лабораторной программе</div><h2>Здесь мы не подменяем программу своей</h2></div>
+      <p>Методичка просит исследовать дополнительные распределения в лабораторном ПО. Она не задаёт здесь их программную параметризацию, поэтому сайт не придумывает собственный генератор.</p>
+    </div>
+
+    <div class="program-grid">
+      <article><span>01</span><h3>Меняйте N</h3><p>Следите за средним, σ, ошибкой среднего, гистограммой и сравнением с теоретическим распределением.</p></article>
+      <article><span>02</span><h3>Меняйте интенсивность μ</h3><p>Сравните, как меняются среднее, ширина и форма распределения.</p></article>
+      <article><span>03</span><h3>Экспоненциальное распределение</h3><p>Переключите генератор в самой лабораторной программе и выполните требуемые наблюдения там.</p></article>
+      <article><span>04</span><h3>Парето: α = 2,0 и α = 1,0</h3><p>Методичка отдельно предлагает эти значения для исследования ограничений привычного поведения сумм случайных величин.</p></article>
+    </div>
+
+    <div class="observation-journal">
+      <div class="journal-head"><div><h3>Мини-журнал наблюдений</h3><p>Можно записать выводы прямо здесь. Они сохраняются только в браузере.</p></div><button class="text-button" id="clearJournal" type="button">Очистить</button></div>
+      <div class="journal-grid">
+        <label>При увеличении N<textarea data-journal="n" placeholder="Что вы увидели?"></textarea></label>
+        <label>При изменении μ<textarea data-journal="mu" placeholder="Что меняется на гистограмме?"></textarea></label>
+        <label>Экспоненциальное<textarea data-journal="exp" placeholder="Наблюдение"></textarea></label>
+        <label>Парето<textarea data-journal="pareto" placeholder="Сравните α = 2,0 и α = 1,0"></textarea></label>
+      </div>
+    </div>
+  </section>
+
+  <section id="check" class="lesson-section check-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">10 · самопроверка</div><h2>Пять вопросов перед обработкой</h2></div>
+      <p>Ответ не нужно угадывать: каждый следует из формул и интерактивов выше.</p>
+    </div>
+    <div class="quiz" id="quiz"></div>
+  </section>
+
+  <section class="source-rule">
+    <strong>Правило этой страницы</strong>
+    <p>Содержание построено только по предоставленной методичке лабораторной 1.1.4. Если методичка не задаёт деталь — например, конкретную параметризацию генератора экспоненциального распределения или Парето — сайт не заполняет пробел внешней теорией.</p>
   </section>
 </main>
-<footer><div class="foot-inner"><span><a href="../">← Каталог лабораторных</a></span><span>Лаба 1.1.4 · учебный интерактивный материал</span></div></footer>
-<script src="app.js"></script>
-</body></html>
+
+<footer class="footer"><a href="../">← Каталог лабораторных</a><span>1.1.4 · редакция 0.10</span></footer>
+<script src="app.js?v=0.10"></script>
+</body>
+</html>
