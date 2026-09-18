@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Удобная учебная библиотека поверх публичной папки Яндекс Диска.">
+  <meta name="description" content="Личная книжная полка и каталог учебников поверх публичной папки Яндекс Диска.">
   <title>Библиотека — Интерактивные материалы МФТИ</title>
-  <link rel="stylesheet" href="../assets/site.css?v=0.6">
-  <link rel="stylesheet" href="bookshelf.css?v=0.6">
+  <link rel="stylesheet" href="../assets/site.css?v=0.7">
+  <link rel="stylesheet" href="bookshelf.css?v=0.7">
 </head>
 <body>
 <header class="site-header">
@@ -23,15 +23,15 @@
   <section class="books-intro">
     <div>
       <div class="kicker">Личная учебная библиотека</div>
-      <h1>Библиотека</h1>
-      <p>Подключите публичную папку Яндекс Диска один раз. Дальше книги можно искать и открывать здесь, не блуждая по структуре Диска.</p>
+      <h1>Книжная полка</h1>
+      <p>Каталог нужен, чтобы найти книгу. Полка — чтобы нужные книги всегда были под рукой.</p>
     </div>
   </section>
 
   <section class="setup" id="setup">
-    <div class="kicker">Подключение библиотеки</div>
-    <h2>Вставьте публичную ссылку</h2>
-    <p class="muted">Подойдёт ссылка вида <code>https://disk.yandex.ru/d/...</code>. Она хранится только в этом браузере.</p>
+    <div class="kicker">Подключение источника</div>
+    <h2>Публичная папка Яндекс Диска</h2>
+    <p class="muted">Ссылка сохраняется только в этом браузере. Сам сайт книг не хранит.</p>
     <form class="setup-form" id="connectForm">
       <label class="sr-only" for="sourceInput">Публичная ссылка на папку Яндекс Диска</label>
       <input id="sourceInput" type="url" inputmode="url" autocomplete="off" placeholder="https://disk.yandex.ru/d/..." required>
@@ -41,80 +41,122 @@
   </section>
 
   <section class="library" id="library" hidden>
-    <div class="toolbar">
-      <div class="search-wrap">
-        <label class="sr-only" for="searchInput">Поиск книг</label>
-        <input id="searchInput" type="search" placeholder="Найти книгу, автора, тему или имя файла…">
-        <button class="clear-search" id="clearSearch" type="button" aria-label="Очистить поиск" hidden>×</button>
+    <div class="section-picker">
+      <div>
+        <span class="section-label">Раздел источника</span>
+        <strong id="sectionName">—</strong>
       </div>
-
-      <div class="mode-toggle" aria-label="Режим каталога">
-        <button id="foldersBtn" type="button" aria-pressed="true">Папки</button>
-        <button id="subjectsBtn" type="button" aria-pressed="false">Предметы</button>
-        <button id="listBtn" type="button" aria-pressed="false">Список</button>
-      </div>
-
-      <button class="btn" id="refreshBtn" type="button">Обновить</button>
-      <button class="btn quiet" id="changeBtn" type="button">Источник</button>
+      <button class="btn" id="chooseSectionBtn" type="button">Сменить раздел</button>
     </div>
 
-    <div class="library-meta">
-      <strong id="bookCount">0 книг</strong>
-      <span class="dot"></span>
-      <span id="scanStatus">Готово</span>
-      <span class="dot"></span>
-      <span class="build-version">0.6</span>
+    <div class="main-tabs" role="tablist" aria-label="Раздел библиотеки">
+      <button id="shelfTab" type="button" role="tab" aria-selected="true">Моя полка <span id="pinCount">0</span></button>
+      <button id="catalogTab" type="button" role="tab" aria-selected="false">Каталог</button>
     </div>
-    <div class="scan-progress" id="scanProgress" aria-hidden="true"><span></span></div>
 
-    <div class="catalog-shell">
-      <aside class="side-panel" id="sidePanel">
-        <div class="side-title">Быстрый переход</div>
-        <div id="quickFolders" class="quick-folders"></div>
-        <div class="source-block">
-          <div class="source-label">Источник</div>
-          <div class="source-value" id="sourceName"></div>
+    <section id="shelfView" class="view-panel">
+      <div class="shelf-toolbar">
+        <div>
+          <h2>Моя полка</h2>
+          <p>Только выбранные книги — без тысяч лишних файлов.</p>
         </div>
-      </aside>
+        <button class="btn" id="starterBtn" type="button" hidden>Собрать базовую полку 1 курса</button>
+      </div>
+      <div id="shelfContent"></div>
+    </section>
 
-      <section class="catalog-main">
-        <nav class="breadcrumbs" id="breadcrumbs" aria-label="Путь по библиотеке"></nav>
-        <div id="catalog" aria-live="polite"></div>
-      </section>
+    <section id="catalogView" class="view-panel" hidden>
+      <div class="catalog-toolbar">
+        <div class="search-wrap">
+          <label class="sr-only" for="searchInput">Поиск по выбранному разделу</label>
+          <input id="searchInput" type="search" placeholder="Название, автор или имя файла…">
+          <button id="clearSearch" class="clear-search" type="button" aria-label="Очистить поиск" hidden>×</button>
+        </div>
+        <button class="btn" id="refreshBtn" type="button">Обновить</button>
+      </div>
+
+      <div class="scan-line">
+        <strong id="bookCount">0 книг</strong>
+        <span class="dot"></span>
+        <span id="scanStatus">Готово</span>
+        <span class="dot"></span>
+        <span>0.7</span>
+      </div>
+      <div class="scan-progress" id="scanProgress" aria-hidden="true"><span></span></div>
+
+      <div class="catalog-layout">
+        <aside class="folder-sidebar">
+          <div class="folder-sidebar-title">Папки раздела</div>
+          <div id="folderTree" class="folder-tree"></div>
+        </aside>
+
+        <section class="catalog-main">
+          <nav id="breadcrumbs" class="breadcrumbs" aria-label="Путь по каталогу"></nav>
+          <div id="catalogContent"></div>
+        </section>
+      </div>
+    </section>
+
+    <div class="source-row">
+      <span id="sourceName"></span>
+      <button class="link-button" id="changeSourceBtn" type="button">Сменить источник</button>
     </div>
   </section>
 </main>
+
+<dialog id="sectionDialog" class="section-dialog">
+  <div class="section-dialog-card">
+    <div class="dialog-heading">
+      <div>
+        <div class="kicker">Раздел источника</div>
+        <h2>Что открыть?</h2>
+        <p>Выберите одну крупную папку. Каталог и поиск будут работать только внутри неё.</p>
+      </div>
+      <button class="dialog-close" id="closeSectionDialog" type="button" aria-label="Закрыть">×</button>
+    </div>
+    <div id="sectionChoices" class="section-choices"></div>
+  </div>
+</dialog>
 
 <dialog id="readerDialog" class="reader-dialog">
   <div class="reader-shell">
     <header class="reader-header">
       <div class="reader-book">
-        <div class="reader-kicker" id="readerSubject">Книга</div>
+        <div class="reader-kicker" id="readerSubject"></div>
         <div class="reader-title" id="readerTitle">—</div>
         <div class="reader-author" id="readerAuthor"></div>
       </div>
       <div class="reader-actions">
-        <a class="btn" id="openDirect" target="_blank" rel="noopener" hidden>Открыть напрямую</a>
-        <a class="btn" id="openYandex" target="_blank" rel="noopener">Яндекс Диск</a>
-        <button class="close-reader" id="closeReader" type="button" aria-label="Закрыть">×</button>
+        <a class="btn" id="readerYandex" target="_blank" rel="noopener">Яндекс Диск</a>
+        <button class="dialog-close" id="closeReader" type="button" aria-label="Закрыть">×</button>
       </div>
     </header>
 
-    <div class="reader-status" id="readerStatus">
-      Получаем прямую ссылку на файл…
+    <div class="reader-controls" id="readerControls" hidden>
+      <button type="button" id="prevPage">←</button>
+      <span>Страница <input id="pageInput" type="number" min="1" value="1"> из <strong id="pageCount">—</strong></span>
+      <button type="button" id="nextPage">→</button>
+      <span class="control-sep"></span>
+      <button type="button" id="zoomOut">−</button>
+      <span id="zoomLabel">100%</span>
+      <button type="button" id="zoomIn">+</button>
     </div>
 
-    <div class="reader-frame-wrap">
-      <iframe id="readerFrame" title="Просмотр книги" referrerpolicy="no-referrer"></iframe>
-      <div class="reader-placeholder" id="readerPlaceholder">
+    <div class="reader-status" id="readerStatus">Подготавливаем документ…</div>
+
+    <div class="reader-stage" id="readerStage">
+      <div class="reader-message" id="readerMessage">
         <div class="loader"></div>
-        <strong>Открываем документ</strong>
-        <span>Для PDF попробуем использовать встроенный просмотр браузера. Если Яндекс не разрешит прямой просмотр, останется кнопка «Яндекс Диск».</span>
+        <strong>Загружаем PDF</strong>
+        <span>Файл не открывается обычной ссылкой: Яндекс отдаёт его как скачивание. Поэтому просмотрщик сначала получает байты PDF, а затем рисует страницы прямо на сайте.</span>
+      </div>
+      <div class="canvas-wrap" id="canvasWrap" hidden>
+        <canvas id="pdfCanvas"></canvas>
       </div>
     </div>
   </div>
 </dialog>
 
-<script src="bookshelf.js?v=0.6"></script>
+<script src="bookshelf.js?v=0.7"></script>
 </body>
 </html>
