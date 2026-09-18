@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Визуальная книжная полка для публичных библиотек на Яндекс Диске.">
   <title>Библиотека — Интерактивные материалы МФТИ</title>
-  <link rel="stylesheet" href="../assets/site.css"><link rel="stylesheet" href="bookshelf.css">
+  <link rel="stylesheet" href="../assets/site.css?v=0.4"><link rel="stylesheet" href="bookshelf-0.4.css">
 </head>
 <body>
 <header class="site-header"><nav class="site-nav" aria-label="Основная навигация"><a class="brand" href="../">Интерактивные материалы МФТИ</a><div class="nav-links"><a href="../physics/">Физика</a><a aria-current="page" href="./">Библиотека</a></div></nav></header>
@@ -28,7 +28,7 @@
       <button class="btn" id="refreshBtn" type="button">Обновить</button>
       <button class="btn quiet" id="changeBtn" type="button">Сменить источник</button>
     </div>
-    <div class="library-meta"><strong id="bookCount">0 книг</strong><span class="dot"></span><span class="source-name" id="sourceName"></span><span class="dot"></span><span id="scanStatus">Готово</span></div>
+    <div class="library-meta"><strong id="bookCount">0 книг</strong><span class="dot"></span><span class="source-name" id="sourceName"></span><span class="dot"></span><span id="scanStatus">Готово</span><span class="dot"></span><span class="build-version">версия 0.4</span></div>
     <div class="scan-progress" id="scanProgress" aria-hidden="true"><span></span></div>
     <p class="scan-note">Большие библиотеки обходятся постепенно: найденные книги появляются на полках сразу, не дожидаясь завершения полного сканирования.</p>
     <div id="catalog" aria-live="polite"></div>
@@ -46,5 +46,5 @@
     </div>
   </div>
 </dialog>
-<script src="bookshelf.js"></script>
+<script src="bookshelf-0.4.js"></script>
 </body></html>
