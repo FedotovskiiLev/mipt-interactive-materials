@@ -1,50 +1,120 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Визуальная книжная полка для публичных библиотек на Яндекс Диске.">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Удобная учебная библиотека поверх публичной папки Яндекс Диска.">
   <title>Библиотека — Интерактивные материалы МФТИ</title>
-  <link rel="stylesheet" href="../assets/site.css?v=0.5"><link rel="stylesheet" href="bookshelf.css?v=0.5">
+  <link rel="stylesheet" href="../assets/site.css?v=0.6">
+  <link rel="stylesheet" href="bookshelf.css?v=0.6">
 </head>
 <body>
-<header class="site-header"><nav class="site-nav" aria-label="Основная навигация"><a class="brand" href="../">Интерактивные материалы МФТИ</a><div class="nav-links"><a href="../physics/">Физика</a><a aria-current="page" href="./">Библиотека</a></div></nav></header>
+<header class="site-header">
+  <nav class="site-nav" aria-label="Основная навигация">
+    <a class="brand" href="../">Интерактивные материалы МФТИ</a>
+    <div class="nav-links">
+      <a href="../physics/">Физика</a>
+      <a aria-current="page" href="./">Библиотека</a>
+    </div>
+  </nav>
+</header>
+
 <main class="books-page">
-  <section class="books-intro"><div><div class="kicker">Личная учебная библиотека</div><h1>Книжная полка</h1><p>Превратите публичную папку Яндекс Диска в удобную библиотеку с поиском. Ссылка на источник хранится только в этом браузере и не попадает в репозиторий.</p></div></section>
+  <section class="books-intro">
+    <div>
+      <div class="kicker">Личная учебная библиотека</div>
+      <h1>Библиотека</h1>
+      <p>Подключите публичную папку Яндекс Диска один раз. Дальше книги можно искать и открывать здесь, не блуждая по структуре Диска.</p>
+    </div>
+  </section>
+
   <section class="setup" id="setup">
-    <div class="kicker">Подключение библиотеки</div><h2>Вставьте публичную ссылку</h2>
-    <p class="muted">Подойдёт публичная ссылка на папку Яндекс Диска вида <code>https://disk.yandex.ru/d/...</code>. Сайт читает только общедоступные сведения о файлах.</p>
+    <div class="kicker">Подключение библиотеки</div>
+    <h2>Вставьте публичную ссылку</h2>
+    <p class="muted">Подойдёт ссылка вида <code>https://disk.yandex.ru/d/...</code>. Она хранится только в этом браузере.</p>
     <form class="setup-form" id="connectForm">
       <label class="sr-only" for="sourceInput">Публичная ссылка на папку Яндекс Диска</label>
       <input id="sourceInput" type="url" inputmode="url" autocomplete="off" placeholder="https://disk.yandex.ru/d/..." required>
-      <button class="btn primary" type="submit">Подключить библиотеку</button>
+      <button class="btn primary" type="submit">Подключить</button>
     </form>
-    <div class="hint">Ссылка сохраняется только на этом устройстве через <code>localStorage</code>. Аккаунт, токен и сервер не нужны.</div>
     <div class="error" id="setupError" role="alert" hidden></div>
   </section>
+
   <section class="library" id="library" hidden>
     <div class="toolbar">
-      <div class="search-wrap"><label class="sr-only" for="searchInput">Поиск книг</label><input id="searchInput" type="search" placeholder="Название, автор, имя файла или предмет…"></div>
-      <div class="toggle" aria-label="Режим отображения"><button id="shelfBtn" type="button" aria-pressed="true">Полки</button><button id="listBtn" type="button" aria-pressed="false">Список</button></div>
+      <div class="search-wrap">
+        <label class="sr-only" for="searchInput">Поиск книг</label>
+        <input id="searchInput" type="search" placeholder="Найти книгу, автора, тему или имя файла…">
+        <button class="clear-search" id="clearSearch" type="button" aria-label="Очистить поиск" hidden>×</button>
+      </div>
+
+      <div class="mode-toggle" aria-label="Режим каталога">
+        <button id="foldersBtn" type="button" aria-pressed="true">Папки</button>
+        <button id="subjectsBtn" type="button" aria-pressed="false">Предметы</button>
+        <button id="listBtn" type="button" aria-pressed="false">Список</button>
+      </div>
+
       <button class="btn" id="refreshBtn" type="button">Обновить</button>
-      <button class="btn quiet" id="changeBtn" type="button">Сменить источник</button>
+      <button class="btn quiet" id="changeBtn" type="button">Источник</button>
     </div>
-    <div class="library-meta"><strong id="bookCount">0 книг</strong><span class="dot"></span><span class="source-name" id="sourceName"></span><span class="dot"></span><span id="scanStatus">Готово</span><span class="dot"></span><span class="build-version">версия 0.5</span></div>
+
+    <div class="library-meta">
+      <strong id="bookCount">0 книг</strong>
+      <span class="dot"></span>
+      <span id="scanStatus">Готово</span>
+      <span class="dot"></span>
+      <span class="build-version">0.6</span>
+    </div>
     <div class="scan-progress" id="scanProgress" aria-hidden="true"><span></span></div>
-    <p class="scan-note">Большие библиотеки обходятся постепенно: найденные книги появляются на полках сразу, не дожидаясь завершения полного сканирования.</p>
-    <div id="catalog" aria-live="polite"></div>
+
+    <div class="catalog-shell">
+      <aside class="side-panel" id="sidePanel">
+        <div class="side-title">Быстрый переход</div>
+        <div id="quickFolders" class="quick-folders"></div>
+        <div class="source-block">
+          <div class="source-label">Источник</div>
+          <div class="source-value" id="sourceName"></div>
+        </div>
+      </aside>
+
+      <section class="catalog-main">
+        <nav class="breadcrumbs" id="breadcrumbs" aria-label="Путь по библиотеке"></nav>
+        <div id="catalog" aria-live="polite"></div>
+      </section>
+    </div>
   </section>
 </main>
-<dialog id="bookDialog">
-  <div class="book-dialog">
-    <div class="cover-wrap"><div class="cover" id="dialogCover"><div class="cover-author" id="coverAuthor"></div><div class="cover-title" id="coverTitle"></div><div class="cover-volume" id="coverVolume"></div></div></div>
-    <div class="dialog-content">
-      <div class="dialog-top"><div><div class="kicker" id="detailSubject"></div><h2 id="detailTitle"></h2><div class="detail-author" id="detailAuthor"></div></div><button class="close" id="closeDialog" type="button" aria-label="Закрыть">×</button></div>
-      <div class="chips"><span class="chip" id="detailKind"></span><span class="chip" id="detailSize"></span></div>
-      <div class="file-path" id="detailPath"></div>
-      <div class="dialog-actions"><a class="btn primary" id="openBook" target="_blank" rel="noopener">Открыть книгу</a><button class="btn" id="copyName" type="button">Скопировать имя файла</button></div>
-      <div class="privacy-note">Кнопка «Открыть книгу» использует публичный просмотр Яндекс Диска. Сам файл на этом сайте не хранится.</div>
+
+<dialog id="readerDialog" class="reader-dialog">
+  <div class="reader-shell">
+    <header class="reader-header">
+      <div class="reader-book">
+        <div class="reader-kicker" id="readerSubject">Книга</div>
+        <div class="reader-title" id="readerTitle">—</div>
+        <div class="reader-author" id="readerAuthor"></div>
+      </div>
+      <div class="reader-actions">
+        <a class="btn" id="openDirect" target="_blank" rel="noopener" hidden>Открыть напрямую</a>
+        <a class="btn" id="openYandex" target="_blank" rel="noopener">Яндекс Диск</a>
+        <button class="close-reader" id="closeReader" type="button" aria-label="Закрыть">×</button>
+      </div>
+    </header>
+
+    <div class="reader-status" id="readerStatus">
+      Получаем прямую ссылку на файл…
+    </div>
+
+    <div class="reader-frame-wrap">
+      <iframe id="readerFrame" title="Просмотр книги" referrerpolicy="no-referrer"></iframe>
+      <div class="reader-placeholder" id="readerPlaceholder">
+        <div class="loader"></div>
+        <strong>Открываем документ</strong>
+        <span>Для PDF попробуем использовать встроенный просмотр браузера. Если Яндекс не разрешит прямой просмотр, останется кнопка «Яндекс Диск».</span>
+      </div>
     </div>
   </div>
 </dialog>
-<script src="bookshelf.js?v=0.5"></script>
-</body></html>
+
+<script src="bookshelf.js?v=0.6"></script>
+</body>
+</html>
