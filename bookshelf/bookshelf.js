@@ -1,6 +1,8 @@
 (() => {
   'use strict';
 
+  const BUILD_VERSION = '0.5';
+
   const STORAGE_KEY = 'mipt.bookshelf.source.v1';
   const VIEW_KEY = 'mipt.bookshelf.view.v1';
   const CACHE_KEY = 'mipt.bookshelf.cache.v2';
@@ -56,9 +58,21 @@
       .trim();
   }
 
+  function normalizeSourceUrl(value) {
+    try {
+      const url = new URL(String(value || '').trim());
+      url.search = '';
+      url.hash = '';
+      url.pathname = url.pathname.replace(/\/+$/, '');
+      return url.toString().replace(/\/$/, '');
+    } catch (_) {
+      return String(value || '').trim();
+    }
+  }
+
   function isYandexPublicUrl(value) {
     try {
-      const url = new URL(value);
+      const url = new URL(normalizeSourceUrl(value));
       const allowed = ['disk.yandex.ru', 'disk.360.yandex.ru', 'yadi.sk'];
       return allowed.includes(url.hostname) && /\/(d|i)\//.test(url.pathname);
     } catch (_) {
@@ -382,7 +396,7 @@
     let failures = 0;
     let hitDirectoryLimit = false;
 
-    scanStatus.textContent = 'Подключаемся к Яндекс Диску…';
+    scanStatus.textContent = `0.4 · подключаемся к Яндекс Диску…`;
 
     try {
       while (frontier.length && foundMap.size < MAX_ITEMS && scannedDirectories < MAX_DIRECTORIES) {
@@ -478,12 +492,18 @@
       const summary = document.createElement('summary');
       summary.textContent = 'Технические сведения';
       const pre = document.createElement('pre');
+      const apiProbe = new URL(API_ENDPOINTS[0]);
+      apiProbe.searchParams.set('public_key', source);
+      apiProbe.searchParams.set('limit', '5');
+
       pre.textContent = [
+        `Версия: ${BUILD_VERSION}`,
         `Источник: ${source}`,
         `Тип ошибки: ${error.name || 'Error'}`,
         `Сообщение: ${error.message || 'нет сообщения'}`,
         `Страница: ${location.href}`,
-        `Онлайн: ${navigator.onLine ? 'да' : 'нет'}`
+        `Онлайн: ${navigator.onLine ? 'да' : 'нет'}`,
+        `Проверочный API-запрос: ${apiProbe.toString()}`
       ].join('\n');
       details.append(summary, pre);
       box.append(details);
@@ -723,7 +743,7 @@
   }
 
   function enterLibrary(url) {
-    source = url.trim();
+    source = normalizeSourceUrl(url);
     localStorage.setItem(STORAGE_KEY, source);
 
     setup.hidden = true;
