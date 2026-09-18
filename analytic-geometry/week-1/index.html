@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Неделя 1: матрицы, определители и правило Крамера. Интерактивный материал первого курса.">
+  <title>Неделя 1 · Матрицы и Крамер</title>
+  <link rel="stylesheet" href="../../assets/site.css?v=0.15">
+  <link rel="stylesheet" href="styles.css?v=0.15">
+</head>
+<body>
+<header class="site-header lesson-header">
+  <nav class="site-nav lesson-nav" aria-label="Основная навигация">
+    <a class="brand" href="../../">Интерактивные материалы МФТИ</a>
+    <div class="nav-links">
+      <a href="#matrices">Матрица</a>
+      <a href="#multiply">Умножение</a>
+      <a href="#commute">AB и BA</a>
+      <a href="#determinant">det</a>
+      <a href="#cramer">Крамер</a>
+      <a href="#homework">Домашка</a>
+      <a href="#check">Проверка</a>
+    </div>
+  </nav>
+</header>
+
+<main class="lesson-page">
+  <section class="lesson-hero">
+    <div>
+      <div class="kicker">Аналитическая геометрия · неделя 1</div>
+      <h1>Матрицы,<br>определители<br>и Крамер.</h1>
+      <p class="lead">Не набор правил, а один маршрут: понять запись матрицы → увидеть «строка × столбец» → разобраться, почему AB обычно не равно BA → научиться считать определитель → применять его к системе.</p>
+      <div class="hero-actions">
+        <a class="lesson-button primary" href="#matrices">Начать с нуля</a>
+        <a class="lesson-button" href="#homework">Перейти к домашке</a>
+      </div>
+    </div>
+    <aside class="source-note">
+      <span>Источник недели</span>
+      <strong>Только загруженные материалы курса</strong>
+      <p>Умнов: §1.1, §5.1, §6.1–6.4. Беклемишев: глава V, матрицы и системы линейных уравнений. Домашний тип про перестановочность восстановлен из проектного чата.</p>
+    </aside>
+  </section>
+
+  <nav class="route" aria-label="Маршрут недели">
+    <a href="#matrices"><b>0</b><span>Что такое матрица</span></a>
+    <a href="#multiply"><b>1</b><span>Строка × столбец</span></a>
+    <a href="#commute"><b>2</b><span>Почему AB ≠ BA</span></a>
+    <a href="#determinant"><b>3</b><span>Определитель</span></a>
+    <a href="#cramer"><b>4</b><span>Правило Крамера</span></a>
+    <a href="#homework"><b>5</b><span>Домашка из чата</span></a>
+  </nav>
+
+  <section class="lesson-section intro-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">Перед началом</div><h2>Что нужно уметь после этой недели</h2></div>
+      <p>Не обязательно помнить всё наизусть. Важно уметь восстановить правило из смысла операции.</p>
+    </div>
+    <div class="goal-grid">
+      <article><b>Читать матрицу</b><span>понимать размер m×n и индекс aᵢⱼ</span></article>
+      <article><b>Умножать</b><span>понимать, откуда берётся каждый элемент AB</span></article>
+      <article><b>Не переставлять бездумно</b><span>знать, что AB и BA — разные операции</span></article>
+      <article><b>Считать det</b><span>2×2 и 3×3 без потери знаков</span></article>
+      <article><b>Решать по Крамеру</b><span>если det A ≠ 0</span></article>
+      <article><b>Проверять себя</b><span>подстановкой и пересчётом ключевых определителей</span></article>
+    </div>
+  </section>
+
+  <section id="matrices" class="lesson-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">00 · матричная запись</div><h2>Матрица — таблица, где место элемента имеет смысл</h2></div>
+      <p>В Умнове матричные объекты вводятся уже в §1.1. Здесь сначала разберём саму запись, а потом действия.</p>
+    </div>
+
+    <div class="split-panel">
+      <div class="explain-card">
+        <h3>Как читать aᵢⱼ</h3>
+        <p>Первый индекс <b>i</b> — номер строки, второй <b>j</b> — номер столбца. Матрица размера <b>m×n</b> имеет m строк и n столбцов.</p>
+        <div class="notation-strip"><span>a<sub>23</sub></span><b>=</b><span>2-я строка</span><b>+</b><span>3-й столбец</span></div>
+        <details class="theory-more">
+          <summary>Ещё из базовой теории</summary>
+          <div><p>Складывать можно матрицы одинакового размера — поэлементно. Умножение матрицы на число тоже выполняется поэлементно. При транспонировании строки становятся столбцами с сохранением порядка.</p></div>
+        </details>
+      </div>
+
+      <div class="interactive-card">
+        <div class="panel-head"><strong>Нажми на элемент</strong><span id="matrixPicked">выбрано a₂₃</span></div>
+        <div class="matrix-explorer" id="matrixExplorer" aria-label="Матрица для изучения индексов"></div>
+        <div class="result-callout" id="matrixExplain"><b>a₂₃ = 6</b><span>2-я строка, 3-й столбец</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="multiply" class="lesson-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">01 · умножение матриц</div><h2>Каждая клетка результата — строка первой на столбец второй</h2></div>
+      <p>Это центральная идея §5.1 Умнова. Умножение определено, когда число столбцов первой матрицы равно числу строк второй.</p>
+    </div>
+
+    <div class="multiply-lab">
+      <div class="matrix-edit-block">
+        <label>A</label>
+        <div class="edit-matrix" id="matrixA">
+          <input value="1" inputmode="numeric"><input value="2" inputmode="numeric">
+          <input value="3" inputmode="numeric"><input value="4" inputmode="numeric">
+        </div>
+      </div>
+      <div class="multiply-symbol">×</div>
+      <div class="matrix-edit-block">
+        <label>B</label>
+        <div class="edit-matrix" id="matrixB">
+          <input value="2" inputmode="numeric"><input value="0" inputmode="numeric">
+          <input value="1" inputmode="numeric"><input value="3" inputmode="numeric">
+        </div>
+      </div>
+      <div class="multiply-symbol">=</div>
+      <div class="matrix-edit-block">
+        <label>AB</label>
+        <div class="result-matrix" id="matrixProduct"></div>
+      </div>
+    </div>
+
+    <div class="formula-stage">
+      <div class="formula-main" id="multiplyFormula">Выбери клетку результата.</div>
+      <p id="multiplyMeaning">Сайт подсветит строку A и столбец B, которые участвуют именно в этой клетке.</p>
+    </div>
+
+    <div class="rule-cards">
+      <article><b>Размер</b><span>(m×n)(n×p) → m×p</span></article>
+      <article><b>Ассоциативность</b><span>A(BC) = (AB)C</span></article>
+      <article><b>Дистрибутивность</b><span>A(B+C) = AB+AC</span></article>
+      <article class="warning"><b>Но не коммутативность</b><span>обычно AB ≠ BA</span></article>
+    </div>
+  </section>
+
+  <section id="commute" class="lesson-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">02 · порядок множителей</div><h2>AB и BA — посчитай оба и сравни</h2></div>
+      <p>И Умнов, и Беклемишев отдельно подчёркивают: матричное умножение в общем случае некоммутативно.</p>
+    </div>
+
+    <div class="compare-products">
+      <div><span>AB</span><div class="compare-matrix" id="abMatrix"></div></div>
+      <div class="compare-sign" id="compareSign">≠</div>
+      <div><span>BA</span><div class="compare-matrix" id="baMatrix"></div></div>
+      <button class="lesson-button" id="swapExample" type="button">Другой пример</button>
+    </div>
+
+    <div class="insight-box"><b>Что стоит запомнить</b><p>Переставлять множители можно только если это отдельно обосновано. Если AB = BA, матрицы называют перестановочными (коммутирующими).</p></div>
+  </section>
+
+  <section id="determinant" class="lesson-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">03 · определитель</div><h2>det A — одно число для квадратной матрицы</h2></div>
+      <p>Для этой недели определитель нужен прежде всего как вход в правило Крамера: если det A ≠ 0, квадратная система имеет единственное решение.</p>
+    </div>
+
+    <div class="det-tabs segmented" id="detTabs">
+      <button class="active" data-det-size="2" type="button">2×2</button>
+      <button data-det-size="3" type="button">3×3</button>
+    </div>
+
+    <div class="det-workbench">
+      <div class="det-inputs" id="detInputs"></div>
+      <div class="det-explain">
+        <div class="det-value" id="detValue">det A = −2</div>
+        <div class="det-steps" id="detSteps"></div>
+      </div>
+    </div>
+
+    <div class="sign-warning"><b>Типичная ошибка:</b> знак «минус» в 3×3 легко потерять. На странице используется разложение по первой строке: <span>a·M₁₁ − b·M₁₂ + c·M₁₃</span>.</div>
+  </section>
+
+  <section id="cramer" class="lesson-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">04 · система Ax = b</div><h2>Правило Крамера: заменяем столбец, не строку</h2></div>
+      <p>В §6.4 Умнова правило сформулировано для квадратной системы: единственное решение существует тогда и только тогда, когда Δ = det A ≠ 0.</p>
+    </div>
+
+    <div class="cramer-tabs segmented" id="cramerTabs">
+      <button class="active" data-cramer-size="2" type="button">Система 2×2</button>
+      <button data-cramer-size="3" type="button">Система 3×3</button>
+    </div>
+
+    <div class="cramer-workbench">
+      <div>
+        <div class="cramer-system" id="cramerSystem"></div>
+        <button class="lesson-button primary" id="solveCramer" type="button">Посчитать Δ и Δᵢ</button>
+        <button class="text-button" id="resetCramer" type="button">Вернуть учебный пример</button>
+      </div>
+      <div class="cramer-output" id="cramerOutput"><p>Сначала попробуй определить, какой столбец надо заменить для Δ₁.</p></div>
+    </div>
+
+    <details class="theory-more wide-details">
+      <summary>Алгоритм, который стоит уметь восстановить без сайта</summary>
+      <div class="algorithm-grid">
+        <article><b>1</b><span>Запиши матрицу коэффициентов A и столбец свободных членов b.</span></article>
+        <article><b>2</b><span>Посчитай Δ = det A.</span></article>
+        <article><b>3</b><span>Для Δᵢ замени i-й столбец A на b.</span></article>
+        <article><b>4</b><span>Если Δ ≠ 0, xᵢ = Δᵢ / Δ.</span></article>
+        <article><b>5</b><span>Подставь найденные значения обратно хотя бы в одно уравнение.</span></article>
+      </div>
+    </details>
+  </section>
+
+  <section id="homework" class="lesson-section homework-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">05 · домашка из проектного чата</div><h2>Матрица, которая коммутирует с любой матрицей 2×2</h2></div>
+      <p>Это тот тип задачи, который мы уже проходили в проектном чате. Здесь решение спрятано лестницей подсказок.</p>
+    </div>
+
+    <div class="homework-problem">
+      <div class="problem-statement">
+        <span class="problem-tag">доказательство через элементы</span>
+        <p>Пусть</p>
+        <div class="symbolic-row">
+          <div class="symbolic-matrix"><span>a</span><span>b</span><span>c</span><span>d</span></div>
+          <b>= X,</b>
+          <div class="symbolic-matrix"><span>e</span><span>f</span><span>g</span><span>h</span></div>
+          <b>= B.</b>
+        </div>
+        <p>Найди все X, для которых <b>XB = BX для любой вещественной матрицы B второго порядка</b>.</p>
+      </div>
+
+      <div class="hint-ladder" id="hintLadder">
+        <button type="button" data-hint="1"><b>Подсказка 1</b><span>С чего начать?</span></button>
+        <div class="hint-content" data-hint-content="1" hidden>Перемножь X·B и B·X. Равенство матриц означает равенство четырёх соответствующих элементов.</div>
+
+        <button type="button" data-hint="2"><b>Подсказка 2</b><span>Какие произведения получатся?</span></button>
+        <div class="hint-content" data-hint-content="2" hidden>
+          XB = [[ae+bg, af+bh], [ce+dg, cf+dh]],<br>
+          BX = [[ea+fc, eb+fd], [ga+hc, gb+hd]].
+        </div>
+
+        <button type="button" data-hint="3"><b>Подсказка 3</b><span>Как использовать «для любой B»?</span></button>
+        <div class="hint-content" data-hint-content="3" hidden>Из (1,1): bg = fc для любых f и g. Можно независимо выбирать f и g. Это заставляет b = 0 и c = 0.</div>
+
+        <button type="button" data-hint="4"><b>Почти решение</b><span>Что остаётся после b=c=0?</span></button>
+        <div class="hint-content" data-hint-content="4" hidden>Сравни (1,2): af = fd для любого f. Значит a = d.</div>
+
+        <button class="solution-reveal" type="button" data-hint="5"><b>Показать полный вывод</b></button>
+        <div class="hint-content solution-content" data-hint-content="5" hidden>Получаем X = [[a,0],[0,a]] = aE. То есть со всеми матрицами второго порядка коммутируют ровно скалярные матрицы λE. Это совпадает с тем выводом, к которому ты пришёл в чате: b=c=0 и a=d.</div>
+      </div>
+    </div>
+
+    <div class="homework-grid">
+      <article>
+        <span class="problem-tag">Крамер · из чата</span>
+        <h3>Главный навык</h3>
+        <p>В проектном чате ты правильно восстановил схему: сначала Δ, затем Δ₁, Δ₂, … заменой <b>столбца</b> на свободные члены, затем xᵢ = Δᵢ/Δ.</p>
+        <div class="mistake-note"><b>Что ловить при проверке:</b> неверно переписанную строку/столбец и знак в определителе. Именно арифметика детерминанта чаще ломает уже правильно выбранный метод.</div>
+      </article>
+      <article>
+        <span class="problem-tag">Точное условие</span>
+        <h3>Почему здесь нет выдуманной системы</h3>
+        <p>Числовое условие одной из систем было прислано в чат скриншотом и не присутствует среди доступных сейчас файлов. Поэтому страница не восстанавливает его по памяти. Интерактив Крамера выше позволяет вставить свою систему, а новые домашние задачи будут добавляться только по точному условию из задачника или программы.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="lesson-section audit-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">Проверка вычислений</div><h2>Если метод выбран правильно, проверь механику</h2></div>
+      <p>Перед сдачей системы пройди короткий аудит.</p>
+    </div>
+    <div class="audit-list">
+      <label><input type="checkbox" data-audit="matrix"> Я выписал коэффициенты в том же порядке, что неизвестные.</label>
+      <label><input type="checkbox" data-audit="delta"> Я отдельно пересчитал Δ.</label>
+      <label><input type="checkbox" data-audit="column"> В Δᵢ заменён именно i-й столбец.</label>
+      <label><input type="checkbox" data-audit="signs"> Я проверил знаки в определителе 3×3.</label>
+      <label><input type="checkbox" data-audit="substitute"> Я подставил найденный ответ обратно в систему.</label>
+    </div>
+  </section>
+
+  <section id="check" class="lesson-section check-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">06 · самопроверка</div><h2>Проверь не память, а понимание</h2></div>
+      <p>Десять случайных вопросов из банка недели. После ответа сразу показывается объяснение.</p>
+    </div>
+
+    <div class="quiz-shell">
+      <div class="quiz-top"><div class="quiz-progress"><i id="quizBar"></i></div><span id="quizCounter">1 / 10</span><b id="quizScore">0 верных</b></div>
+      <div id="quizHost"></div>
+      <button class="lesson-button" id="quizRestart" type="button">Новый набор</button>
+    </div>
+  </section>
+
+  <section class="lesson-section sources-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">Источники</div><h2>Откуда взята теория недели</h2></div>
+    </div>
+    <div class="source-grid">
+      <article><b>А. Е. Умнов</b><span>«Аналитическая геометрия и линейная алгебра», 4-е изд., МФТИ, 2021.</span><p>§1.1 — матричные объекты и определители 2-го/3-го порядка; §5.1 — умножение матриц; §6.1–6.4 — определители и правило Крамера.</p></article>
+      <article><b>Д. В. Беклемишев</b><span>«Курс аналитической геометрии и линейной алгебры», 13-е изд., 2015.</span><p>Глава V: матрицы, умножение матриц и системы линейных уравнений; отдельно используется термин «перестановочные матрицы».</p></article>
+      <article><b>Сборник задач Беклемишевых и др.</b><span>4-е изд., 2016.</span><p>Основной источник точных условий домашних задач, когда они присутствуют в плане недели.</p></article>
+    </div>
+  </section>
+</main>
+
+<footer class="lesson-footer"><a href="../">← Все недели</a><span>Неделя 1 · редакция 0.15</span></footer>
+<script src="app.js?v=0.15"></script>
+</body>
+</html>
