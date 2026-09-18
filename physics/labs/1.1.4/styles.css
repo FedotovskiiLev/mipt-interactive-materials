@@ -133,3 +133,15 @@ main{max-width:1240px;margin:auto;padding:0 20px 80px}
   .notation-grid{grid-template-columns:1fr}.theory-body{padding:16px}.program-display{padding:13px}.program-controls{padding:14px}
   .program-run-buttons{grid-template-columns:1fr}.program-metrics{grid-template-columns:1fr 1fr}.quiz-progress-row{align-items:flex-start;flex-direction:column}.quiz-progress{width:100%}
 }
+
+
+/* ===== 0.12 · финальная учебная программа ===== */
+.program-evidence-note{display:grid;grid-template-columns:230px minmax(0,1fr);gap:16px;align-items:start;margin-bottom:12px;padding:14px 16px;border:1px solid #cfdbe6;border-radius:13px;background:#f8fbfd}.program-evidence-note strong{font-size:.82rem}.program-evidence-note span{font-size:.78rem;color:#61707d;line-height:1.5}.program-evidence-note code{font-size:.74rem;background:#edf2f6;padding:1px 4px;border-radius:4px}
+.program-body-final{grid-template-columns:300px minmax(0,1fr)}
+.program-two-buttons{display:grid;grid-template-columns:1fr 1fr;gap:6px}.program-two-buttons .button{min-width:0;padding-left:7px;padding-right:7px}.program-file-actions{margin-top:10px}.program-file-actions .text-button{text-align:left}
+.program-metadata{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.program-meta-chip{padding:7px 9px;border:1px solid #dce4eb;border-radius:9px;background:#f8fafb;font-size:.7rem;color:#667480}.program-meta-chip b{color:#26333f;margin-left:3px}
+.program-four-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.program-chart-card{min-width:0;border:1px solid #dde4ea;border-radius:12px;background:#fff;padding:11px}.program-chart-card canvas{display:block;width:100%;height:230px}.program-chart-card p{margin:6px 3px 0;color:#6c7884;font-size:.7rem;line-height:1.42}.program-chart-card .panel-head span{font-size:.67rem}
+.program-boundaries-final{grid-template-columns:1fr 1fr}.program-boundaries-final p{margin-bottom:0}
+.data-file-meta{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.data-file-meta span{padding:6px 8px;border:1px solid #dfe5eb;border-radius:8px;background:#fafcfd;color:#66727e;font-size:.7rem}.data-file-meta b{color:#24313d}
+@media(max-width:1100px){.program-four-grid{grid-template-columns:1fr}.program-chart-card canvas{height:280px}}
+@media(max-width:760px){.program-evidence-note{grid-template-columns:1fr}.program-body-final{grid-template-columns:1fr}.program-two-buttons{grid-template-columns:1fr}.program-chart-card canvas{height:230px}.program-boundaries-final{grid-template-columns:1fr}}

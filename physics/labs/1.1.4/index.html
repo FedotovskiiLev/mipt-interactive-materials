@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Интерактивный учебный материал к лабораторной работе 1.1.4: статистические закономерности на примере фона космического излучения.">
   <title>1.1.4 — Статистика космического фона</title>
-  <link rel="stylesheet" href="styles.css?v=0.11">
+  <link rel="stylesheet" href="styles.css?v=0.12">
 </head>
 <body>
 <header class="topbar">
@@ -239,8 +239,8 @@
           <div class="theory-copy">
             <h3>Они появляются в задании на симуляцию</h3>
             <p>Методичка просит переключить генератор штатной программы на экспоненциальное распределение и на распределение Парето, отдельно исследуя Парето при <b>α = 2,0</b> и <b>α = 1,0</b>.</p>
-            <p>В предоставленном материале не задаётся точная программная формула этих генераторов. Поэтому сайт не вводит свою параметризацию и не выдаёт её за лабораторную.</p>
-            <div class="zero-note"><b>Веб-версия ниже воспроизводит только Пуассон.</b> Для экспоненциального и Парето остаются задание и журнал наблюдений — ровно то, что поддерживается источником.</div>
+            <p>Сохранённый файл старой программы подтверждает отдельный режим <b>exp</b> и хранит параметр <b>μ</b>, но предоставленные материалы не задают точную программную формулу генератора. Поэтому сайт не вводит свою параметризацию и не выдаёт её за лабораторную.</p>
+            <div class="zero-note"><b>Веб-версия генерирует только Пуассон.</b> Для <b>exp</b> доступна настоящая архивная серия из лабораторной программы, которую можно воспроизвести и обработать. Парето остаётся заданием штатной программы и журналом наблюдений.</div>
           </div>
           <div class="theory-side">
             <div class="compare-mini"><b>Парето</b><span>α = 2,0 и α = 1,0</span></div>
@@ -496,71 +496,100 @@
   
   <section id="program" class="lesson-section program-section">
     <div class="section-heading">
-      <div><div class="eyebrow">09 · учебная версия программы</div><h2>После лабы программу можно открыть здесь</h2></div>
-      <p>Это не копия исходного ПО и не имитация аппаратуры. Веб-версия воспроизводит только те операции, которые однозначно задаются методичкой: просмотр серии, текущие статистики, гистограмму и симуляцию закона Пуассона.</p>
+      <div><div class="eyebrow">09 · учебная версия программы</div><h2>Те же четыре представления данных — прямо в браузере</h2></div>
+      <p>После лабы исходная программа может быть недоступна, поэтому здесь есть её учебный рабочий аналог. Эксперимент и симуляция разделены как два источника данных; после получения серии работают одни и те же четыре графика.</p>
+    </div>
+
+    <div class="program-evidence-note">
+      <strong>Что удалось восстановить по методичке, файлам и работе с программой</strong>
+      <span>Эксперимент записывает последовательность отсчётов установки. Симуляция создаёт такую же по формату последовательность генератором псевдослучайных чисел. В сохранённых файлах встречаются <code>poisson</code> и <code>exp</code>, параметр <code>mu</code> и 4000 точек. Три статистических графика совпадают с графиками раздела «Ваши данные»; четвёртый показывает отсчёты во времени.</span>
     </div>
 
     <div class="program-window">
       <div class="program-titlebar">
-        <div><span class="program-dot"></span><span class="program-dot"></span><span class="program-dot"></span><strong>1.1.4 · учебная программа</strong></div>
-        <div class="program-scope">полностью в браузере</div>
+        <div><span class="program-dot"></span><span class="program-dot"></span><span class="program-dot"></span><strong>1.1.4 · учебная лабораторная программа</strong></div>
+        <div class="program-scope">статическая веб-версия · без аппаратуры</div>
       </div>
 
       <div class="program-tabs segmented" id="programModeButtons">
-        <button class="active" data-mode="replay" type="button">Эксперимент / файл</button>
-        <button data-mode="poisson" type="button">Симуляция Пуассона</button>
+        <button class="active" data-mode="experiment" type="button">Эксперимент</button>
+        <button data-mode="simulation" type="button">Симуляция</button>
       </div>
 
-      <div class="program-body">
+      <div class="program-body program-body-final">
         <aside class="program-controls">
-          <div id="programReplayControls">
-            <h3>Источник серии</h3>
-            <p>Режим воспроизводит уже записанные отсчёты. К аппаратуре сайт не подключается.</p>
-            <button class="button program-wide" id="progUseAnalyzer" type="button">Взять данные из анализатора</button>
-            <button class="button program-wide" id="progUseSample" type="button">Учебная серия 4000 отсчётов</button>
-          </div>
-
-          <div id="programPoissonControls" hidden>
-            <h3>Параметры Пуассона</h3>
-            <label>Среднее n̄
-              <input id="progPoissonMean" type="range" min="1" max="30" step="1" value="6">
-              <span class="program-range-value" id="progPoissonMeanValue">6</span>
-            </label>
-            <label>Размер серии N
-              <select id="progPoissonN">
-                <option value="100">100</option>
-                <option value="500">500</option>
-                <option value="1000">1000</option>
-                <option value="4000" selected>4000</option>
+          <div id="programExperimentControls">
+            <h3>Эксперимент · запись</h3>
+            <p>На сайте нет доступа к счётчику, поэтому этот режим воспроизводит уже сохранённый эксперимент — по одному отсчёту за интервал.</p>
+            <label>Пример
+              <select id="progExperimentExample">
+                <option value="examples/experiment-2026.txt">Эксперимент 2026 · 4000 точек</option>
+                <option value="examples/experiment-2022.txt">Эксперимент 2022 · 4000 точек</option>
               </select>
             </label>
-            <button class="button primary program-wide" id="progGenerate" type="button">Сгенерировать серию</button>
-            <p class="program-method-note">Генератор использует только закон Пуассона, формула которого дана в методичке. Экспоненциальное и Парето здесь намеренно не генерируются.</p>
+            <button class="button primary program-wide" id="progLoadExperiment" type="button">Загрузить эксперимент</button>
+            <button class="button program-wide" id="progUseAnalyzer" type="button">Взять текущий файл из анализатора</button>
+          </div>
+
+          <div id="programSimulationControls" hidden>
+            <h3>Симуляция · ГПСЧ</h3>
+            <label>Распределение
+              <select id="progDistribution">
+                <option value="poisson">poisson</option>
+                <option value="exp">exp</option>
+              </select>
+            </label>
+
+            <div id="progPoissonSettings">
+              <label>Интенсивность / среднее μ
+                <input id="progPoissonMean" type="range" min="0.2" max="20" step="0.2" value="1">
+                <span class="program-range-value" id="progPoissonMeanValue">1</span>
+              </label>
+              <label>Количество точек
+                <select id="progPoissonN">
+                  <option value="100">100</option>
+                  <option value="500">500</option>
+                  <option value="1000">1000</option>
+                  <option value="4000" selected>4000</option>
+                </select>
+              </label>
+              <div class="program-two-buttons">
+                <button class="button primary" id="progGenerate" type="button">Сгенерировать</button>
+                <button class="button" id="progLoadPoissonArchive" type="button">Архивный poisson</button>
+              </div>
+            </div>
+
+            <div id="progExpSettings" hidden>
+              <div class="program-method-note"><b>exp: генератор не подменяем.</b> В архивном файле программы указан режим <code>exp</code> и <code>mu = 1.0</code>, но точный алгоритм в предоставленных материалах не описан. Поэтому здесь воспроизводится реальная сохранённая серия, а не придуманная реализация.</div>
+              <button class="button primary program-wide" id="progLoadExpArchive" type="button">Загрузить exp · μ = 1,0 · 4000 точек</button>
+            </div>
           </div>
 
           <hr>
 
           <h3>Воспроизведение</h3>
-          <label>Скорость
+          <label>Скорость просмотра
             <select id="progSpeed">
-              <option value="1">1 отсчёт за шаг</option>
-              <option value="5">5 за шаг</option>
-              <option value="20" selected>20 за шаг</option>
-              <option value="100">100 за шаг</option>
+              <option value="1">1 точка за шаг</option>
+              <option value="5">5 точек за шаг</option>
+              <option value="20" selected>20 точек за шаг</option>
+              <option value="100">100 точек за шаг</option>
             </select>
           </label>
-
           <div class="program-run-buttons">
             <button class="button primary" id="progStart" type="button">Старт</button>
             <button class="button" id="progPause" type="button">Пауза</button>
             <button class="button" id="progReset" type="button">Сброс</button>
           </div>
-
-          <button class="text-button" id="progToAnalyzer" type="button">Передать всю серию в анализатор ↓</button>
+          <div class="program-two-buttons program-file-actions">
+            <button class="text-button" id="progToAnalyzer" type="button">В анализатор ↓</button>
+            <button class="text-button" id="progDownload" type="button">Скачать .txt</button>
+          </div>
           <div class="program-data-info" id="progDataInfo">Серия ещё не выбрана.</div>
         </aside>
 
         <div class="program-display">
+          <div class="program-metadata" id="progMetadata"></div>
           <div class="program-metrics">
             <div><span>N сейчас</span><b id="progLiveN">0</b></div>
             <div><span>текущее nᵢ</span><b id="progLiveCurrent">—</b></div>
@@ -570,49 +599,59 @@
           </div>
 
           <div class="program-recent-wrap">
-            <div class="panel-head"><strong>Последние отсчёты</strong><span id="progCursorLabel">0 / 0</span></div>
+            <div class="panel-head"><strong>Поток отсчётов</strong><span id="progCursorLabel">0 / 0</span></div>
             <div class="program-recent" id="progRecent"></div>
           </div>
 
-          <div class="program-chart-wrap">
-            <div class="panel-head"><strong>Гистограмма накопленных данных</strong><span id="progChartNote">wₙ = Nₙ/N</span></div>
-            <canvas id="programChart"></canvas>
+          <div class="program-four-grid">
+            <article class="program-chart-card">
+              <div class="panel-head"><strong>1 · Отсчёты во времени</strong><span id="progTimeNote">nᵢ по последовательным интервалам</span></div>
+              <canvas id="programTimeChart"></canvas>
+              <p>Высота каждого столбца — очередное значение из файла. Синяя линия — накопленное среднее веб-версии. В старой программе на этом окне были дополнительные служебные линии, но их точные подписи по доступным материалам не восстановлены.</p>
+            </article>
+            <article class="program-chart-card">
+              <div class="panel-head"><strong>2 · Гистограмма</strong><span id="progHistNote">wₙ = Nₙ/N</span></div>
+              <canvas id="programHistChart"></canvas>
+              <p>Тот же график, что в обработке данных: частоты значений n. Для эксперимента и poisson поверх можно сравнивать закон Пуассона; для exp показывается только сама серия.</p>
+            </article>
+            <article class="program-chart-card">
+              <div class="panel-head"><strong>3 · Среднее при росте N</strong><span>⟨n⟩ по первым N точкам</span></div>
+              <canvas id="programMeanChart"></canvas>
+              <p>Показывает, как оценка среднего стабилизируется по мере накопления данных.</p>
+            </article>
+            <article class="program-chart-card">
+              <div class="panel-head"><strong>4 · Ошибка среднего</strong><span>log₁₀ σ⟨n⟩ от log₁₀ N</span></div>
+              <canvas id="programErrorChart"></canvas>
+              <p>Для пуассоновских данных рядом строится зависимость √(⟨n⟩/N); для exp остаётся только экспериментальная кривая.</p>
+            </article>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="program-boundaries">
+    <div class="program-boundaries program-boundaries-final">
       <article>
-        <div class="method-label">Веб-версия умеет</div>
-        <h3>То, что определяется методичкой однозначно</h3>
-        <ul>
-          <li>воспроизводить файл отсчётов и показывать рост N;</li>
-          <li>считать ⟨n⟩, σₙ и σ⟨n⟩;</li>
-          <li>строить текущую гистограмму;</li>
-          <li>генерировать выборку по закону Пуассона;</li>
-          <li>передавать полученную серию в полный анализатор.</li>
-        </ul>
+        <div class="method-label">Эксперимент и симуляция</div>
+        <h3>Разный источник — одинаковый формат результата</h3>
+        <p>Эксперимент получает nᵢ от установки. Симуляция получает nᵢ от ГПСЧ. Дальше обе серии можно читать, группировать и обрабатывать одинаковыми статистическими методами.</p>
       </article>
-
       <article>
-        <div class="method-label warm-label">Остаётся заданием штатной программы</div>
-        <h3>Экспоненциальное и Парето</h3>
-        <p>Методичка требует переключить генератор на экспоненциальное распределение и исследовать Парето при α = 2,0 и α = 1,0, но не задаёт здесь формулу программного генератора. Поэтому сайт не вводит своё соглашение.</p>
+        <div class="method-label warm-label">Граница реконструкции</div>
+        <h3>Не выдаём догадку за интерфейс исходной программы</h3>
+        <p>Четыре типа графиков восстановлены. Для временного окна точный смысл дополнительных трёх линий не подтверждён, поэтому веб-версия показывает отсчёты и накопленное среднее, но не придумывает названия остальных линий.</p>
       </article>
     </div>
 
     <div class="observation-journal">
-      <div class="journal-head"><div><h3>Мини-журнал наблюдений</h3><p>Можно записать выводы из штатной программы или из веб-версии. Записи сохраняются только в браузере.</p></div><button class="text-button" id="clearJournal" type="button">Очистить</button></div>
+      <div class="journal-head"><div><h3>Мини-журнал наблюдений</h3><p>Записи сохраняются только в браузере.</p></div><button class="text-button" id="clearJournal" type="button">Очистить</button></div>
       <div class="journal-grid">
         <label>При увеличении N<textarea data-journal="n" placeholder="Что происходит со средним и ошибкой?"></textarea></label>
         <label>При изменении μ<textarea data-journal="mu" placeholder="Что меняется на гистограмме?"></textarea></label>
-        <label>Экспоненциальное<textarea data-journal="exp" placeholder="Наблюдение из штатной программы"></textarea></label>
-        <label>Парето<textarea data-journal="pareto" placeholder="Сравните α = 2,0 и α = 1,0"></textarea></label>
+        <label>Экспоненциальное<textarea data-journal="exp" placeholder="Что видно по архивной exp-серии?"></textarea></label>
+        <label>Парето<textarea data-journal="pareto" placeholder="Сравните α = 2,0 и α = 1,0 по штатной программе"></textarea></label>
       </div>
     </div>
   </section>
-
 
   <section id="check" class="lesson-section check-section">
     <div class="section-heading">
@@ -644,7 +683,7 @@
   </section>
 </main>
 
-<footer class="footer"><a href="../">← Каталог лабораторных</a><span>1.1.4 · редакция 0.11</span></footer>
-<script src="app.js?v=0.11"></script>
+<footer class="footer"><a href="../">← Каталог лабораторных</a><span>1.1.4 · редакция 0.12</span></footer>
+<script src="app.js?v=0.12"></script>
 </body>
 </html>

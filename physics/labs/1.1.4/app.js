@@ -48,19 +48,54 @@
     return out;
   }
 
-  function parseData(text) {
+  function parseLabFile(text) {
     const values = [];
+    const meta = { kind:'unknown', distribution:null, mu:null, start:null, stop:null, declaredCount:null };
     for (const rawLine of String(text || '').split(/\r?\n/)) {
       const line = rawLine.trim();
-      if (!line || line.startsWith('#')) continue;
-      const clean = line.split('#')[0];
-      for (const token of clean.split(/[;\s]+/)) {
-        if (!token) continue;
-        const x = Number(token.replace(',', '.'));
-        if (Number.isFinite(x)) values.push(x);
+      if (!line) continue;
+      if (line.startsWith('#')) {
+        const c=line.replace(/^#\s*/,'').trim();
+        if (/^Симуляция\b/i.test(c)) meta.kind='simulation';
+        let m=c.match(/^Начало эксперимента\s+в\s+(.+)$/i); if(m){meta.kind='experiment';meta.start=m[1].trim()}
+        m=c.match(/^остановка эксперимента\s+в\s+(.+)$/i); if(m){meta.kind='experiment';meta.stop=m[1].trim()}
+        m=c.match(/^Распределение:\s*([^,]+),\s*интенсивность\s+mu\s*=\s*([0-9.,]+)/i); if(m){meta.kind='simulation';meta.distribution=m[1].trim().toLowerCase();meta.mu=Number(m[2].replace(',','.'))}
+        m=c.match(/^количество точек\s+(\d+)/i); if(m)meta.declaredCount=Number(m[1]);
+        continue;
+      }
+      const clean=line.split('#')[0];
+      for(const token of clean.split(/[;\s]+/)){
+        if(!token)continue;
+        const x=Number(token.replace(',','.'));
+        if(Number.isFinite(x))values.push(x);
       }
     }
-    return values;
+    return {values,meta};
+  }
+  function parseData(text) { return parseLabFile(text).values; }
+  function serializeLabFile(values,meta={}){
+    const head=[];
+    if(meta.kind==='simulation'){
+      head.push('# Симуляция на основе генератора псевдослучайных чисел');
+      if(meta.distribution)head.push(`# Распределение: ${meta.distribution}${Number.isFinite(meta.mu)?`, интенсивность mu = ${meta.mu}`:''}`);
+    }else if(meta.kind==='experiment'){
+      if(meta.start)head.push(`# Начало эксперимента в  ${meta.start}`);
+    }
+    head.push(...values.map(v=>String(v)));
+    head.push(`# количество точек ${values.length}`);
+    if(meta.kind==='experiment'&&meta.stop)head.push(`# остановка эксперимента в ${meta.stop}`);
+    return head.join('\n')+'\n';
+  }
+  function metaSummary(meta){
+    const parts=[];
+    if(meta?.kind==='experiment')parts.push(['тип','эксперимент']);
+    else if(meta?.kind==='simulation')parts.push(['тип','симуляция']);
+    if(meta?.distribution)parts.push(['распределение',meta.distribution]);
+    if(Number.isFinite(meta?.mu))parts.push(['μ',format(meta.mu,3)]);
+    if(meta?.start)parts.push(['начало',meta.start]);
+    if(meta?.stop)parts.push(['остановка',meta.stop]);
+    if(Number.isFinite(meta?.declaredCount))parts.push(['заявлено точек',meta.declaredCount]);
+    return parts;
   }
 
   function logGamma(z) {
@@ -354,6 +389,7 @@
 
   // ---------- 08. Анализ реальных данных ----------
   let rawData=[];
+  let rawMeta={kind:'unknown',distribution:null,mu:null,start:null,stop:null,declaredCount:null};
   let currentData=[];
   let currentStats=null;
   let analysisMode='hist';
@@ -372,7 +408,8 @@
     const v=validateGrouping();if(!v.ok){$('dataStatus').textContent=v.msg;return}
     currentData=groupData(rawData,v.k);currentStats=stats(currentData,v.tau);
     if(!currentData.length){$('dataStatus').textContent='После группировки не осталось полных интервалов.';return}
-    $('dataStatus').textContent=`Прочитано ${rawData.length} исходных значений. Для τ = ${format(v.tau,3)} с получено ${currentData.length} полных групп.`;
+    const metaBits=metaSummary(rawMeta).map(([k,val])=>`${k}: ${val}`).join(' · ');
+    $('dataStatus').textContent=`Прочитано ${rawData.length} исходных значений. Для τ = ${format(v.tau,3)} с получено ${currentData.length} полных групп.${metaBits?` · ${metaBits}`:''}`;
     renderDashboard(v);
   }
 
@@ -380,7 +417,8 @@
     const s=currentStats,dashboard=$('analysisDashboard');dashboard.className='analysis-dashboard';
     const shares=[1,2,3].map(k=>({k,p:currentData.filter(x=>Math.abs(x-s.mean)<=k*s.sigma+1e-12).length/currentData.length}));
     const ratio=s.sqrtMean>0?s.sigma/s.sqrtMean:NaN;
-    dashboard.innerHTML=`
+    const metaHtml=metaSummary(rawMeta).length?`<div class="data-file-meta">${metaSummary(rawMeta).map(([k,val])=>`<span>${k}: <b>${val}</b></span>`).join('')}</div>`:'';
+    dashboard.innerHTML=`${metaHtml}
       <div class="data-passport">
         ${metric('исходных отсчётов',rawData.length,'N₀')}
         ${metric('длительность исходной серии',`${format(rawData.length*v.base,2)} с`,'N₀τ₀')}
@@ -473,14 +511,15 @@
     $('compareTable').innerHTML=`<div style="overflow:auto"><table class="compare-table"><thead><tr><th>τ, с</th><th>N</th><th>⟨n⟩</th><th>σₙ</th><th>√⟨n⟩</th><th>σ⟨n⟩</th><th>j, с⁻¹</th><th>σⱼ, с⁻¹</th><th>1/√nΣ</th></tr></thead><tbody>${rows||'<tr><td colspan="9">Нет корректных τ, кратных τ₀.</td></tr>'}</tbody></table></div>`;
   }
 
-  fileInput.addEventListener('change',async()=>{const f=fileInput.files?.[0];if(!f)return;dataText.value=await f.text();rawData=parseData(dataText.value);updateAnalysis()});
-  $('analyzeBtn').addEventListener('click',()=>{rawData=parseData(dataText.value);updateAnalysis()});
+  fileInput.addEventListener('change',async()=>{const f=fileInput.files?.[0];if(!f)return;dataText.value=await f.text();const parsed=parseLabFile(dataText.value);rawData=parsed.values;rawMeta=parsed.meta;updateAnalysis()});
+  $('analyzeBtn').addEventListener('click',()=>{const parsed=parseLabFile(dataText.value);rawData=parsed.values;rawMeta=parsed.meta;updateAnalysis()});
   [baseTauInput,tauInput,tauListInput].forEach(el=>el.addEventListener('change',()=>{if(rawData.length)updateAnalysis()}));
-  $('sampleBtn').addEventListener('click',async()=>{try{const r=await fetch('sample_data.txt',{cache:'no-cache'});if(!r.ok)throw new Error();dataText.value=await r.text();rawData=parseData(dataText.value);updateAnalysis()}catch(_){$('dataStatus').textContent='Не удалось загрузить учебный пример.'}});
+  $('sampleBtn').addEventListener('click',async()=>{try{const r=await fetch('sample_data.txt',{cache:'no-cache'});if(!r.ok)throw new Error();dataText.value=await r.text();const parsed=parseLabFile(dataText.value);rawData=parsed.values;rawMeta=parsed.meta;updateAnalysis()}catch(_){$('dataStatus').textContent='Не удалось загрузить учебный пример.'}});
 
   // ---------- 09. Учебная версия лабораторной программы ----------
-  let programMode='replay';
+  let programMode='experiment';
   let programData=[];
+  let programMeta={kind:'unknown',distribution:null,mu:null,start:null,stop:null,declaredCount:null};
   let programShown=[];
   let programCursor=0;
   let programTimer=null;
@@ -490,49 +529,39 @@
     do{k++;p*=Math.random()}while(p>L);
     return k-1;
   }
-  function stopProgram(){
-    if(programTimer){clearInterval(programTimer);programTimer=null}
-  }
+  function stopProgram(){if(programTimer){clearInterval(programTimer);programTimer=null}}
   function setProgramMode(mode){
     programMode=mode;
     $$('#programModeButtons button').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
-    $('programReplayControls').hidden=mode!=='replay';
-    $('programPoissonControls').hidden=mode!=='poisson';
-    resetProgramPlayback(false);
-    $('progDataInfo').textContent=mode==='replay'
-      ? 'Выберите данные из анализатора или учебную серию.'
-      : 'Задайте n̄ и размер серии, затем сгенерируйте данные.';
+    $('programExperimentControls').hidden=mode!=='experiment';
+    $('programSimulationControls').hidden=mode!=='simulation';
+    stopProgram();programShown=[];programCursor=0;renderProgram();
+    $('progDataInfo').textContent=mode==='experiment'?'Выберите запись эксперимента.':'Выберите распределение и источник серии.';
   }
-  function setProgramData(data,label){
+  function setSimulationDistribution(kind){
+    $('progPoissonSettings').hidden=kind!=='poisson';
+    $('progExpSettings').hidden=kind!=='exp';
+  }
+  async function loadProgramFile(url,label){
     stopProgram();
-    programData=[...data];
-    programShown=[];
-    programCursor=0;
-    $('progDataInfo').textContent=`${label}: ${programData.length} значений.`;
-    renderProgram();
+    try{
+      const r=await fetch(url,{cache:'no-cache'});if(!r.ok)throw new Error(`HTTP ${r.status}`);
+      const parsed=parseLabFile(await r.text());
+      setProgramData(parsed.values,label,parsed.meta);
+    }catch(e){$('progDataInfo').textContent=`Не удалось загрузить пример: ${e.message}`}
   }
-  function resetProgramPlayback(clearData=false){
-    stopProgram();
-    programShown=[];
-    programCursor=0;
-    if(clearData)programData=[];
-    renderProgram();
+  function setProgramData(data,label,meta={}){
+    stopProgram();programData=[...data];programMeta={kind:'unknown',distribution:null,mu:null,start:null,stop:null,declaredCount:null,...meta};programShown=[];programCursor=0;
+    $('progDataInfo').textContent=`${label}: ${programData.length} значений.`;renderProgram();
   }
+  function resetProgramPlayback(){stopProgram();programShown=[];programCursor=0;renderProgram()}
   function startProgram(){
-    if(!programData.length){
-      $('progDataInfo').textContent='Сначала выберите или сгенерируйте серию.';
-      return;
-    }
+    if(!programData.length){$('progDataInfo').textContent='Сначала выберите или сгенерируйте серию.';return}
     if(programCursor>=programData.length){programShown=[];programCursor=0}
-    stopProgram();
-    programTimer=setInterval(()=>{
+    stopProgram();programTimer=setInterval(()=>{
       const batch=Math.max(1,Number($('progSpeed').value)||1);
-      for(let i=0;i<batch&&programCursor<programData.length;i++){
-        programShown.push(programData[programCursor]);
-        programCursor++;
-      }
-      renderProgram();
-      if(programCursor>=programData.length)stopProgram();
+      for(let i=0;i<batch&&programCursor<programData.length;i++){programShown.push(programData[programCursor]);programCursor++}
+      renderProgram();if(programCursor>=programData.length)stopProgram();
     },120);
   }
   function renderProgram(){
@@ -543,110 +572,64 @@
     $('progLiveSigma').textContent=s?format(s.sigma,3):'—';
     $('progLiveSem').textContent=s?format(s.sem,4):'—';
     $('progCursorLabel').textContent=`${programCursor} / ${programData.length}`;
-
-    const recent=$('progRecent');
-    recent.innerHTML='';
-    programShown.slice(-18).forEach(v=>{
-      const el=document.createElement('span');
-      el.textContent=v;
-      recent.append(el);
-    });
-
-    drawProgramHistogram();
+    const recent=$('progRecent');recent.innerHTML='';programShown.slice(-18).forEach(v=>{const el=document.createElement('span');el.textContent=v;recent.append(el)});
+    const chips=[...metaSummary(programMeta)];
+    if(programData.length)chips.push(['точек',programData.length]);
+    $('progMetadata').innerHTML=chips.length?chips.map(([k,v])=>`<span class="program-meta-chip">${k}: <b>${v}</b></span>`).join(''):'<span class="program-meta-chip">данные ещё не выбраны</span>';
+    drawProgramTime();drawProgramHist();drawProgramMean();drawProgramError();
   }
-  function drawProgramHistogram(){
-    const canvas=$('programChart');
-    if(!canvas)return;
-    const {ctx,w,h}=canvasSetup(canvas),pad={l:48,r:18,t:16,b:38};
-    drawAxes(ctx,w,h,pad,'n','wₙ');
-    if(!programShown.length)return;
-
-    const map=histogramMap(programShown);
-    const keys=[...map.keys()].sort((a,b)=>a-b);
-    const min=Math.min(...keys),max=Math.max(...keys),vals=[];
-    const theoreticalMean=programMode==='poisson'
-      ? Number($('progPoissonMean').value)
-      : stats(programShown,1).mean;
-    let ymax=0;
-
-    for(let n=min;n<=max;n++){
-      const emp=(map.get(n)||0)/programShown.length;
-      const p=poissonPMF(n,theoreticalMean);
-      vals.push({n,emp,p});
-      ymax=Math.max(ymax,emp,p);
-    }
-
-    ymax=Math.max(ymax*1.16,.01);
-    const plotW=w-pad.l-pad.r,plotH=h-pad.t-pad.b,step=plotW/Math.max(1,vals.length);
-    const X=i=>pad.l+(i+.5)*step;
-    const Y=v=>h-pad.b-v/ymax*plotH;
-
-    vals.forEach((d,i)=>{
-      const bw=Math.max(3,step*.65),x=X(i)-bw/2,y=Y(d.emp);
-      ctx.fillStyle=COLORS.data2;
-      ctx.fillRect(x,y,bw,h-pad.b-y);
-    });
-
-    ctx.strokeStyle=COLORS.poisson;
-    ctx.lineWidth=2;
-    ctx.beginPath();
-    vals.forEach((d,i)=>{
-      const x=X(i),y=Y(d.p);
-      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
-    });
-    ctx.stroke();
-
-    ctx.fillStyle=COLORS.muted;
-    ctx.font='10px system-ui';
-    ctx.textAlign='center';
-    const every=Math.max(1,Math.ceil(vals.length/12));
-    vals.forEach((d,i)=>{if(i%every===0)ctx.fillText(String(d.n),X(i),h-pad.b+15)});
-
-    $('progChartNote').textContent=programMode==='poisson'
-      ? `столбцы — выборка; линия — Пуассон при n̄ = ${format(theoreticalMean,1)}`
-      : 'столбцы — данные; линия — Пуассон со средним текущей серии';
+  function programCanvas(id,xLabel,yLabel){const canvas=$(id);const setup=canvasSetup(canvas);const pad={l:48,r:16,t:15,b:38};drawAxes(setup.ctx,setup.w,setup.h,pad,xLabel,yLabel);return{...setup,pad}}
+  function drawProgramTime(){
+    const {ctx,w,h,pad}=programCanvas('programTimeChart',programMeta.kind==='experiment'?'t, с':'номер отсчёта','nᵢ');if(!programShown.length)return;
+    const maxPts=120,start=Math.max(0,programShown.length-maxPts),view=programShown.slice(start),running=[];let total=0;
+    for(let i=0;i<programShown.length;i++){total+=programShown[i];if(i>=start)running.push(total/(i+1))}
+    const ymax=Math.max(1,...view,...running)*1.15,plotW=w-pad.l-pad.r,plotH=h-pad.t-pad.b,step=plotW/Math.max(1,view.length),Y=v=>h-pad.b-v/ymax*plotH;
+    view.forEach((v,i)=>{const x=pad.l+i*step+step*.15,bw=Math.max(1,step*.7),y=Y(v);ctx.fillStyle=COLORS.data2;ctx.fillRect(x,y,bw,h-pad.b-y)});
+    ctx.strokeStyle=COLORS.data;ctx.lineWidth=2;ctx.beginPath();running.forEach((v,i)=>{const x=pad.l+(i+.5)*step,y=Y(v);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();
+    ctx.fillStyle=COLORS.muted;ctx.font='10px system-ui';ctx.textAlign='center';ctx.fillText(String(start+1),pad.l,h-pad.b+15);ctx.fillText(String(programShown.length),w-pad.r,h-pad.b+15);
+    $('progTimeNote').textContent=programMeta.kind==='experiment'?'каждая точка соответствует очередному интервалу τ₀':'время воспроизведения ускорено; порядок точек сохранён';
+  }
+  function drawProgramHist(){
+    const {ctx,w,h,pad}=programCanvas('programHistChart','n','wₙ');if(!programShown.length)return;
+    const map=histogramMap(programShown),keys=[...map.keys()].sort((a,b)=>a-b),min=keys[0],max=keys.at(-1),vals=[];
+    const poissonLike=programMeta.kind==='experiment'||programMeta.distribution==='poisson';const mu=programMeta.distribution==='poisson'&&Number.isFinite(programMeta.mu)?programMeta.mu:stats(programShown,1).mean;let ymax=0;
+    for(let n=min;n<=max;n++){const emp=(map.get(n)||0)/programShown.length,p=poissonLike?poissonPMF(n,mu):null;vals.push({n,emp,p});ymax=Math.max(ymax,emp,p||0)}ymax=Math.max(.01,ymax*1.15);
+    const plotW=w-pad.l-pad.r,plotH=h-pad.t-pad.b,step=plotW/Math.max(1,vals.length),X=i=>pad.l+(i+.5)*step,Y=v=>h-pad.b-v/ymax*plotH;
+    vals.forEach((d,i)=>{const bw=Math.max(2,step*.66),y=Y(d.emp);ctx.fillStyle=COLORS.data2;ctx.fillRect(X(i)-bw/2,y,bw,h-pad.b-y)});
+    if(poissonLike){ctx.strokeStyle=COLORS.poisson;ctx.lineWidth=2;ctx.beginPath();vals.forEach((d,i)=>i?ctx.lineTo(X(i),Y(d.p)):ctx.moveTo(X(i),Y(d.p)));ctx.stroke()}
+    ctx.fillStyle=COLORS.muted;ctx.font='10px system-ui';ctx.textAlign='center';const every=Math.max(1,Math.ceil(vals.length/10));vals.forEach((d,i)=>{if(i%every===0)ctx.fillText(String(d.n),X(i),h-pad.b+15)});
+    $('progHistNote').textContent=poissonLike?'столбцы — данные; линия — Пуассон':'exp: только экспериментальная гистограмма';
+  }
+  function drawProgramMean(){
+    const {ctx,w,h,pad}=programCanvas('programMeanChart','N','⟨n⟩');if(programShown.length<2)return;
+    const pref=[0];programShown.forEach(x=>pref.push(pref.at(-1)+x));const ns=sampledIndices(programShown.length,160),ys=ns.map(n=>pref[n]/n);let ymin=Math.min(...ys),ymax=Math.max(...ys);
+    if(programMeta.distribution==='poisson'&&Number.isFinite(programMeta.mu)){ymin=Math.min(ymin,programMeta.mu);ymax=Math.max(ymax,programMeta.mu)}if(ymax===ymin){ymin-=.5;ymax+=.5}else{const d=(ymax-ymin)*.15;ymin-=d;ymax+=d}
+    const X=n=>pad.l+(n-2)/(Math.max(3,programShown.length)-2)*(w-pad.l-pad.r),Y=v=>h-pad.b-(v-ymin)/(ymax-ymin)*(h-pad.t-pad.b);
+    ctx.strokeStyle=COLORS.data;ctx.lineWidth=2;ctx.beginPath();ns.forEach((n,i)=>i?ctx.lineTo(X(n),Y(pref[n]/n)):ctx.moveTo(X(n),Y(pref[n]/n)));ctx.stroke();
+    if(programMeta.distribution==='poisson'&&Number.isFinite(programMeta.mu)){ctx.strokeStyle=COLORS.poisson;ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(pad.l,Y(programMeta.mu));ctx.lineTo(w-pad.r,Y(programMeta.mu));ctx.stroke();ctx.setLineDash([])}
+  }
+  function drawProgramError(){
+    const {ctx,w,h,pad}=programCanvas('programErrorChart','log₁₀ N','log₁₀ σ⟨n⟩');if(programShown.length<5)return;
+    const ns=sampledIndices(programShown.length,100).filter(n=>n>=5),poissonLike=programMeta.kind==='experiment'||programMeta.distribution==='poisson';
+    const fullMean=stats(programShown,1).mean,data=ns.map(n=>({n,sem:prefixStats(programShown,n).sem,theory:poissonLike?Math.sqrt(Math.max(fullMean,1e-12)/n):null})).filter(d=>d.sem>0);if(!data.length)return;
+    const xs=data.map(d=>Math.log10(d.n)),ys=data.map(d=>Math.log10(d.sem));if(poissonLike)ys.push(...data.map(d=>Math.log10(d.theory)));
+    let xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys);if(xmax===xmin)xmax=xmin+1;if(ymax===ymin)ymax=ymin+1;
+    const X=x=>pad.l+(x-xmin)/(xmax-xmin)*(w-pad.l-pad.r),Y=y=>h-pad.b-(y-ymin)/(ymax-ymin)*(h-pad.t-pad.b);
+    const line=(key,color)=>{ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();data.forEach((d,i)=>{const x=X(Math.log10(d.n)),y=Y(Math.log10(d[key]));i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke()};line('sem',COLORS.data);if(poissonLike)line('theory',COLORS.theory);
   }
 
   $$('#programModeButtons button').forEach(btn=>btn.addEventListener('click',()=>setProgramMode(btn.dataset.mode)));
-  $('progPoissonMean').addEventListener('input',()=>{
-    $('progPoissonMeanValue').textContent=$('progPoissonMean').value;
-    if(programMode==='poisson'&&programShown.length)drawProgramHistogram();
-  });
-  $('progGenerate').addEventListener('click',()=>{
-    const mu=Number($('progPoissonMean').value);
-    const N=Number($('progPoissonN').value);
-    const data=Array.from({length:N},()=>poissonRandom(mu));
-    setProgramData(data,`Пуассон: n̄ = ${mu}`);
-  });
-  $('progUseAnalyzer').addEventListener('click',()=>{
-    if(!rawData.length){
-      $('progDataInfo').textContent='В анализаторе пока нет данных. Сначала загрузите файл в разделе «Ваши данные».';
-      return;
-    }
-    setProgramData(rawData,'Данные из анализатора');
-  });
-  $('progUseSample').addEventListener('click',async()=>{
-    try{
-      const r=await fetch('sample_data.txt',{cache:'no-cache'});
-      if(!r.ok)throw new Error();
-      setProgramData(parseData(await r.text()),'Учебная серия');
-    }catch(_){
-      $('progDataInfo').textContent='Не удалось загрузить учебную серию.';
-    }
-  });
-  $('progStart').addEventListener('click',startProgram);
-  $('progPause').addEventListener('click',stopProgram);
-  $('progReset').addEventListener('click',()=>resetProgramPlayback(false));
-  $('progToAnalyzer').addEventListener('click',()=>{
-    if(!programData.length){
-      $('progDataInfo').textContent='Нет серии для передачи.';
-      return;
-    }
-    dataText.value=programData.join('\n');
-    rawData=[...programData];
-    updateAnalysis();
-    document.querySelector('#analyzer').scrollIntoView({behavior:'smooth'});
-  });
+  $('progDistribution').addEventListener('change',()=>setSimulationDistribution($('progDistribution').value));
+  $('progPoissonMean').addEventListener('input',()=>$('progPoissonMeanValue').textContent=format(Number($('progPoissonMean').value),1));
+  $('progGenerate').addEventListener('click',()=>{const mu=Number($('progPoissonMean').value),N=Number($('progPoissonN').value),data=Array.from({length:N},()=>poissonRandom(mu));setProgramData(data,`Симуляция poisson · μ=${format(mu,1)}`,{kind:'simulation',distribution:'poisson',mu,declaredCount:N})});
+  $('progLoadPoissonArchive').addEventListener('click',()=>loadProgramFile('examples/simulation-poisson-2026.txt','Архивная симуляция poisson 2026'));
+  $('progLoadExpArchive').addEventListener('click',()=>loadProgramFile('examples/simulation-exp-2022.txt','Архивная симуляция exp 2022'));
+  $('progLoadExperiment').addEventListener('click',()=>loadProgramFile($('progExperimentExample').value,'Запись эксперимента'));
+  $('progUseAnalyzer').addEventListener('click',()=>{if(!rawData.length){$('progDataInfo').textContent='В анализаторе пока нет данных.';return}setProgramData(rawData,'Данные из анализатора',rawMeta)});
+  $('progStart').addEventListener('click',startProgram);$('progPause').addEventListener('click',stopProgram);$('progReset').addEventListener('click',resetProgramPlayback);
+  $('progToAnalyzer').addEventListener('click',()=>{if(!programData.length){$('progDataInfo').textContent='Нет серии для передачи.';return}dataText.value=serializeLabFile(programData,programMeta);rawData=[...programData];rawMeta={...programMeta,declaredCount:programData.length};updateAnalysis();document.querySelector('#analyzer').scrollIntoView({behavior:'smooth'})});
+  $('progDownload').addEventListener('click',()=>{if(!programData.length){$('progDataInfo').textContent='Нет серии для сохранения.';return}const blob=new Blob([serializeLabFile(programData,programMeta)],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`lab-1.1.4-${programMeta.kind||'data'}-${programMeta.distribution||'series'}.txt`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
+  setSimulationDistribution('poisson');
 
   // ---------- 09. Журнал ----------
   const JOURNAL_KEY='mipt.lab114.journal.v1';
@@ -677,7 +660,13 @@
     {q:'Сколько событий нужно примерно зарегистрировать для относительной ошибки порядка 1%?',o:['10⁴','10²','10⁸'],a:0,e:'1/√10⁴ = 1/100 = 1%.'},
     {q:'Какие значения α методичка предлагает исследовать для Парето?',o:['2,0 и 1,0','10 и 20','0 и 100'],a:0,e:'В задании явно указаны α = 2,0 и α = 1,0.'},
     {q:'Что делает анализатор со строками файла, начинающимися с #?',o:['Игнорирует как комментарии','Считает их нулевыми отсчётами','Прерывает обработку'],a:0,e:'Строки с # являются комментариями и не входят в числовую серию.'},
-    {q:'Что происходит с неполной последней группой при группировке на сайте?',o:['Она не используется','Она дополняется нулями','Она удваивается'],a:0,e:'Обработчик использует только полные группы.'}
+    {q:'Что происходит с неполной последней группой при группировке на сайте?',o:['Она не используется','Она дополняется нулями','Она удваивается'],a:0,e:'Обработчик использует только полные группы.'},
+    {q:'Чем в программе принципиально отличаются эксперимент и симуляция?',o:['Источником nᵢ: установка или ГПСЧ','Форматом числового файла','Формулой среднего'],a:0,e:'После получения серии обработка одинакова; отличается именно источник отсчётов.'},
+    {q:'Что в сохранённом файле симуляции сообщает тип распределения?',o:['Строка комментария, начинающаяся с # Распределение','Первое число серии','Имя студента'],a:0,e:'Файл хранит служебные метаданные в строках комментариев #; числовая серия идёт отдельными строками.'},
+    {q:'Почему веб-версия не генерирует exp самостоятельно?',o:['Точный алгоритм генератора не задан в предоставленных материалах','JavaScript не умеет случайные числа','Экспоненциальные данные нельзя хранить в txt'],a:0,e:'Мы не подменяем лабораторную программу собственной параметризацией. Вместо этого доступна реальная архивная exp-серия.'},
+    {q:'Какие четыре представления данных собраны в учебной веб-программе?',o:['Отсчёты во времени, гистограмма, среднее при росте N, ошибка среднего','Только четыре одинаковые гистограммы','Силы, скорости, энергии и координаты'],a:0,e:'Это четыре графика, восстановленные для этой работы; три статистических совпадают с разделом обработки данных.'},
+    {q:'Можно ли считать скоростью физического эксперимента скорость анимации на сайте?',o:['Нет, это только скорость воспроизведения уже имеющихся точек','Да, всегда','Только в режиме exp'],a:0,e:'Сайт ускоряет просмотр. В экспериментальном файле порядок и данные сохраняются, но экранная анимация не является ходом реального измерения.'},
+    {q:'Что делает сайт с личной строкой «Студент …» в опубликованных примерах?',o:['Не публикует её, сохраняя научные метаданные файла','Использует её как числовой отсчёт','Рисует её на графике'],a:0,e:'Для примеров на сайте личные заголовки удалены; тип режима, распределение, время и число точек сохранены.'}
   ];
 
   let quizSet=[],quizIndex=0,quizCorrect=0,quizAnswered=false,quizCountMode=10;
@@ -753,8 +742,8 @@
 
   // ---------- init ----------
   function init(){
-    renderMeasurement();renderEditableCounts();renderStatStep();renderFrequencyHistogram();renderPoisson();renderGrouping();renderErrorSlider();renderWorkflow();loadJournal();setProgramMode('replay');renderProgram();startQuiz(10);
+    renderMeasurement();renderEditableCounts();renderStatStep();renderFrequencyHistogram();renderPoisson();renderGrouping();renderErrorSlider();renderWorkflow();loadJournal();setProgramMode('experiment');renderProgram();startQuiz(10);
   }
-  let resizeTimer=null;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{renderPoisson();if(currentData.length)drawAnalysisChart();if(programShown.length)drawProgramHistogram()},120)});
+  let resizeTimer=null;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{renderPoisson();if(currentData.length)drawAnalysisChart();if(programShown.length){drawProgramTime();drawProgramHist();drawProgramMean();drawProgramError()}},120)});
   init();
 })();
