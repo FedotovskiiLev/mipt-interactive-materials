@@ -118,7 +118,7 @@
   }
 
   // ---------- 00. Теория с нуля ----------
-  const theoryItems=$$('#theoryAccordion details');
+  const theoryItems=$$('#theoryAccordion details, #methodicDepth details');
   $('openAllTheory').addEventListener('click',()=>theoryItems.forEach(d=>d.open=true));
   $('closeAllTheory').addEventListener('click',()=>theoryItems.forEach(d=>d.open=false));
 
@@ -810,9 +810,35 @@
   }));
   $('quizRestart').addEventListener('click',()=>startQuiz(quizCountMode));
 
+  // ---------- 11. Самостоятельное построение графиков ----------
+  const GRAPH_CHECK_KEY='lab114.graphChecklist.v1';
+  function loadGraphChecklist(){
+    let saved={};
+    try{saved=JSON.parse(localStorage.getItem(GRAPH_CHECK_KEY)||'{}')}catch(_){}
+    $$('[data-graph-check]').forEach(box=>{
+      box.checked=!!saved[box.dataset.graphCheck];
+      box.addEventListener('change',()=>{
+        const state={};
+        $$('[data-graph-check]').forEach(x=>state[x.dataset.graphCheck]=x.checked);
+        localStorage.setItem(GRAPH_CHECK_KEY,JSON.stringify(state));
+      });
+    });
+  }
+  $$('[data-copy-target]').forEach(btn=>btn.addEventListener('click',async()=>{
+    const node=$(btn.dataset.copyTarget);if(!node)return;
+    const old=btn.textContent;
+    try{
+      await navigator.clipboard.writeText(node.textContent);
+      btn.textContent='Скопировано';
+    }catch(_){
+      btn.textContent='Выделите код вручную';
+    }
+    setTimeout(()=>btn.textContent=old,1400);
+  }));
+
   // ---------- init ----------
   function init(){
-    renderMeasurement();renderEditableCounts();renderStatStep();renderFrequencyHistogram();renderPoisson();renderGrouping();renderErrorSlider();renderWorkflow();loadJournal();setProgramMode('experiment');renderProgram();startQuiz(10);
+    renderMeasurement();renderEditableCounts();renderStatStep();renderFrequencyHistogram();renderPoisson();renderGrouping();renderErrorSlider();renderWorkflow();loadJournal();loadGraphChecklist();setProgramMode('experiment');renderProgram();startQuiz(10);
   }
   let resizeTimer=null;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{renderPoisson();if(currentData.length)drawAnalysisChart();if(programShown.length){drawProgramTime();drawProgramHist();drawProgramMean();drawProgramError()}},120)});
   init();

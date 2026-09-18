@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Интерактивный учебный материал к лабораторной работе 1.1.4: статистические закономерности на примере фона космического излучения.">
   <title>1.1.4 — Статистика космического фона</title>
-  <link rel="stylesheet" href="styles.css?v=0.13">
+  <link rel="stylesheet" href="styles.css?v=0.14">
 </head>
 <body>
 <header class="topbar">
@@ -43,7 +43,7 @@
     </aside>
   </section>
 
-  <section class="route route-eight" aria-label="Маршрут по работе">
+  <section class="route route-nine" aria-label="Маршрут по работе">
     <a href="#theory"><b>0</b><span>Теория с нуля</span></a>
     <a href="#measure"><b>1</b><span>Что измеряется</span></a>
     <a href="#statistics"><b>2</b><span>Как описать серию</span></a>
@@ -52,6 +52,7 @@
     <a href="#grouping"><b>5</b><span>Группировка и ошибка</span></a>
     <a href="#analyzer"><b>6</b><span>Свои данные</span></a>
     <a href="#program"><b>7</b><span>Учебная программа</span></a>
+    <a href="#build-graphs"><b>8</b><span>Построить самому</span></a>
   </section>
 
   
@@ -83,7 +84,7 @@
 
     
     <div class="methodic-depth" id="methodicDepth">
-      <div class="methodic-depth-head"><div><span class="method-label">Подробно по методичке</span><h3>Быстрые карточки выше — не предел: здесь можно раскрыть всю нужную теорию</h3><p>Эти блоки нужны, если какое-то понятие хочется понять глубже. Они повторяют смысл введения и теоретической части методички, но разбиты на небольшие темы, на которые можно нажимать по отдельности.</p></div></div>
+      <div class="methodic-depth-head"><div><span class="method-label">Подробно по методичке</span><h3>Подробное чтение по методичке</h3><p>Если короткого объяснения недостаточно, откройте нужную тему. Здесь введение и теория методички разбиты на небольшие самостоятельные блоки — от устройства счётчика до предельных статистических закономерностей.</p></div></div>
       <div class="deep-theory-grid">
         <details class="deep-theory-card"><summary><strong>Что такое ионизирующее излучение и радиоактивный фон?</strong><span>с. 1</span></summary><div class="deep-theory-body"><p><b>Ионизирующее излучение</b> — потоки частиц или электромагнитные волны, которые способны ионизовать вещество. В методичке в качестве частиц названы протоны, электроны и позитроны, альфа-частицы и нейтроны, а для электромагнитного излучения — рентгеновский и гамма-диапазоны.</p><p>Даже если рядом нет специального радиоактивного источника, в лаборатории есть <b>фон</b>. Он складывается прежде всего из космического излучения и излучения радиоактивных веществ, присутствующих в небольших количествах в окружающих материалах, приборах и помещении.</p><div class="composition-row"><div><b>≈ 85%</b><span>протоны первичных космических лучей</span></div><div><b>≈ 10%</b><span>альфа-частицы, то есть ядра гелия</span></div><div><b>&lt; 5%</b><span>ядра более тяжёлых элементов</span></div><div><b>≈ 1%</b><span>электроны и позитроны</span></div></div><p>При взаимодействии первичных космических лучей с атмосферой появляются вторичные нестабильные частицы. В методичке в качестве примеров приведены мюоны и пи-мезоны.</p></div></details>
         <details class="deep-theory-card"><summary><strong>Как устроен счётчик Гейгера—Мюллера?</strong><span>с. 1–2</span></summary><div class="deep-theory-body geiger-deep"><div><p>Счётчик представляет собой наполненный газом металлический цилиндр с двумя электродами. Корпус служит <b>катодом</b>, а вдоль оси цилиндра натянута тонкая нить — <b>анод</b>. На счётчик подаётся напряжение около <b>400 В</b>.</p><p>Пролетающая частица ионизует газ и может выбивать электроны из стенок. Электроны ускоряются сильным электрическим полем, сталкиваются с молекулами газа и выбивают новые электроны. Возникает лавина вторичной ионизации.</p><p>Лавина вызывает короткий импульс тока. Электрическая схема установки регистрирует этот импульс, АЦП переводит его в цифровой вид, а информация передаётся компьютеру через USB.</p></div><div class="geiger-scheme"><div class="geiger-cylinder"><div class="geiger-wire"></div><span class="geiger-gas">газ</span><span class="geiger-avalanche">лавина e⁻</span></div><span class="geiger-label cathode">корпус · катод</span><span class="geiger-label anode">нить · анод</span><span class="geiger-label voltage">≈ 400 В</span><span class="geiger-label pulse">импульс → АЦП → USB → компьютер</span></div><div class="zero-note"><b>От чего зависит число регистраций?</b> Методичка перечисляет размеры счётчика, его положение и ориентацию, давление и состав газа и материал стенок. При фиксированной установке число зарегистрированных частиц пропорционально средней интенсивности излучения. При постоянной фоновой интенсивности общее число регистраций растёт пропорционально времени наблюдения.</div></div></details>
@@ -754,13 +755,274 @@
     </div>
   </section>
 
+
+  <section id="build-graphs" class="lesson-section build-graphs-section">
+    <div class="section-heading">
+      <div><div class="eyebrow">11 · теперь построй сам</div><h2>Четыре графика без кнопки «построить»</h2></div>
+      <p>Автоматическая обработка полезна для проверки, но студент должен уметь получить те же графики из сырого файла самостоятельно. Ниже — несколько полноценных способов, от таблиц до Python.</p>
+    </div>
+
+    <div class="self-build-intro">
+      <article class="self-build-goal">
+        <div class="method-label">Задача</div>
+        <h3>Воспроизведите те же четыре окна</h3>
+        <p>Возьмите реальный файл или файл симуляции и постройте: отсчёты во времени, гистограмму частот, накопленное среднее и погрешность среднего в log-log координатах.</p>
+      </article>
+      <div class="self-build-checklist">
+        <label><input type="checkbox" data-graph-check="time"> <span><b>1 · nᵢ(t)</b><small>отсчёты во времени</small></span></label>
+        <label><input type="checkbox" data-graph-check="hist"> <span><b>2 · wₙ</b><small>гистограмма частот</small></span></label>
+        <label><input type="checkbox" data-graph-check="mean"> <span><b>3 · ⟨n⟩(N)</b><small>накопленное среднее</small></span></label>
+        <label><input type="checkbox" data-graph-check="sem"> <span><b>4 · σ⟨n⟩(N)</b><small>log-log график ошибки</small></span></label>
+      </div>
+    </div>
+
+    <details class="graph-theory-reminder" open>
+      <summary><div><span class="graph-step-number">0</span><strong>Общая подготовка данных</strong></div><span>сделайте один раз</span></summary>
+      <div class="graph-guide-body">
+        <div class="common-prep-grid">
+          <article><b>Числовая серия</b><p>Строки с <code>#</code> — комментарии. Числовые строки — значения nᵢ.</p></article>
+          <article><b>Номер измерения</b><p>Создайте i = 1, 2, …, N. Время можно взять как t = (i−1)τ.</p></article>
+          <article><b>Группировка</b><p>Для τ = 10 с складывайте неперекрывающиеся группы по 10 исходных секундных отсчётов; для τ = 20 с — по 20 и т.д.</p></article>
+          <article><b>Одинаковая серия</b><p>Все статистики и графики для выбранного τ должны считаться из одной и той же сгруппированной последовательности.</p></article>
+        </div>
+        <div class="guide-warning"><b>Не путайте два вида графиков.</b> Третий показывает, как меняется оценка среднего при накоплении данных. Четвёртый показывает ошибку найденного среднего σ⟨n⟩ = σₙ/√N и на странице строится в log-log координатах.</div>
+      </div>
+    </details>
+
+    <div class="graph-methods">
+      <details class="graph-method" open>
+        <summary><div><span class="graph-method-badge">способ 1</span><strong>LibreOffice Calc</strong><small>самый близкий к приложению методички</small></div><span class="graph-open-label">открыть инструкцию</span></summary>
+        <div class="graph-guide-body">
+          <h3>Шаг 1. Загрузите данные</h3>
+          <p>Откройте файл как текст или вставьте только числовые строки в столбец C. В столбце A создайте номера 1, 2, 3, …, а в B — время. Если τ = 1 с, можно использовать 0, 1, 2, …; в общем случае формула времени — <b>t = (i−1)τ</b>.</p>
+
+          <h3>Шаг 2. При необходимости сгруппируйте по τ</h3>
+          <p>Для τ = 10 с первый новый отсчёт равен сумме первых десяти исходных. Например, если данные начинаются с C2:</p>
+          <div class="formula-box"><code>=СУММ(C2:C11)</code></div>
+          <p>Следующая независимая группа должна использовать C12:C21. Для 20, 40, 80 с принцип тот же. Не используйте перекрывающиеся группы, если хотите получить обычную группировку лабораторной.</p>
+
+          <h3>График 1 · отсчёты во времени</h3>
+          <ol class="guide-steps">
+            <li>Выделите столбцы времени и nᵢ.</li>
+            <li>Вставьте диаграмму XY.</li>
+            <li>Подпишите оси: X — <b>t, с</b>, Y — <b>n</b>.</li>
+            <li>Укажите τ в заголовке или подписи под рисунком.</li>
+          </ol>
+
+          <h3>График 2 · гистограмма wₙ</h3>
+          <p>В отдельном столбце выпишите все целые n от 0 до максимума. Рядом получите количество попаданий функцией ЧАСТОТА/FREQUENCY, а затем разделите каждое количество на N.</p>
+          <div class="formula-box"><code>wₙ = Nₙ / N</code><br><span>После группировки до 400 точек: частоту каждого значения делите на 400.</span></div>
+          <p>Постройте столбчатую или ступенчатую диаграмму: X — n, Y — wₙ. Именно нормированные частоты удобны для сравнения серий с разным N.</p>
+
+          <h3>График 3 · накопленное среднее</h3>
+          <p>В следующем столбце на каждой строке вычисляйте среднее от первого отсчёта до текущего:</p>
+          <div class="formula-box"><code>=СРЗНАЧ($C$2:C2)</code> → протянуть вниз</div>
+          <p>Постройте XY: X — номер N, Y — этот столбец. В начале кривая обычно заметно колеблется, а затем становится стабильнее.</p>
+
+          <h3>График 4 · ошибка среднего в log-log координатах</h3>
+          <p>Чтобы сохранить именно определение дисперсии из методички, удобно не полагаться на различия статистических функций разных версий Calc, а использовать σₙ² = ⟨n²⟩−⟨n⟩².</p>
+          <div class="formula-box">
+            <code>E2 = C2^2</code><br>
+            <code>⟨n²⟩ₖ = СРЗНАЧ($E$2:E2)</code><br>
+            <code>σₙ = КОРЕНЬ(⟨n²⟩ₖ − ⟨n⟩ₖ²)</code><br>
+            <code>σ⟨n⟩ = σₙ / КОРЕНЬ(N)</code>
+          </div>
+          <p>Создайте ещё два столбца: <code>LOG10(N)</code> и <code>LOG10(σ⟨n⟩)</code>. Точки, где σ⟨n⟩ = 0, в логарифмический график не включаются.</p>
+        </div>
+      </details>
+
+      <details class="graph-method">
+        <summary><div><span class="graph-method-badge">способ 2</span><strong>Microsoft Excel</strong><small>удобно для большой таблицы и нескольких τ</small></div><span class="graph-open-label">открыть инструкцию</span></summary>
+        <div class="graph-guide-body">
+          <h3>Соберите одну рабочую таблицу</h3>
+          <div class="table-schema"><span>A · N</span><span>B · t</span><span>C · nᵢ</span><span>D · ⟨n⟩</span><span>E · nᵢ²</span><span>F · σₙ</span><span>G · σ⟨n⟩</span><span>H/I · log₁₀</span></div>
+          <div class="formula-box">
+            <code>D2 = AVERAGE($C$2:C2)</code><br>
+            <code>E2 = C2^2</code><br>
+            <code>F2 = SQRT(MAX(0,AVERAGE($E$2:E2)-D2^2))</code><br>
+            <code>G2 = F2/SQRT(A2)</code>
+          </div>
+          <p>В русской локализации Excel названия функций могут отображаться по-русски, но смысл формул тот же.</p>
+
+          <h3>Четыре диаграммы</h3>
+          <div class="four-chart-how">
+            <article><b>1 · nᵢ(t)</b><span>XY: X = B, Y = C.</span></article>
+            <article><b>2 · wₙ</b><span>Список целых n + COUNTIF/COUNT; затем столбчатая диаграмма.</span></article>
+            <article><b>3 · ⟨n⟩(N)</b><span>XY: X = A, Y = D.</span></article>
+            <article><b>4 · ошибка log-log</b><span>H = LOG10(A), I = LOG10(G), затем XY по H и I.</span></article>
+          </div>
+          <p>Для сравнения нескольких τ удобнее сделать отдельный лист на каждый интервал или одну таблицу-блок на каждый τ. Тогда формулы и диапазоны не смешиваются.</p>
+        </div>
+      </details>
+
+      <details class="graph-method">
+        <summary><div><span class="graph-method-badge">способ 3</span><strong>Microsoft Word</strong><small>если графики сразу собираются внутри отчёта</small></div><span class="graph-open-label">открыть инструкцию</span></summary>
+        <div class="graph-guide-body">
+          <div class="guide-warning"><b>Word — это не отдельный вычислительный пакет.</b> При вставке диаграммы он открывает встроенную таблицу данных, фактически мини-Excel. Поэтому расчёты всё равно делаются в таблице, но рисунок сразу находится в отчёте.</div>
+          <h3>Шаг 1. Вставьте диаграмму</h3>
+          <p>Выберите <b>Вставка → Диаграмма</b>. В появившейся таблице замените демонстрационные значения своими. Для 4000 точек расширьте диапазон таблицы.</p>
+          <h3>Шаг 2. Используйте ту же структуру столбцов</h3>
+          <div class="table-schema"><span>N</span><span>t</span><span>nᵢ</span><span>⟨n⟩</span><span>nᵢ²</span><span>σₙ</span><span>σ⟨n⟩</span><span>log₁₀</span></div>
+          <p>Формулы можно использовать те же, что в разделе Excel. Для гистограммы создайте отдельную маленькую таблицу «n / Nₙ / wₙ».</p>
+          <h3>Шаг 3. Не пытайтесь вместить всё в одну диаграмму</h3>
+          <p>Сделайте четыре отдельных объекта. Для каждого задайте оси, подпись и τ. Это проще проверять и проще объяснять на защите.</p>
+          <h3>Когда этот способ разумен</h3>
+          <p>Если расчёты уже сделаны и нужно быстро оформить отчёт — Word удобен. Если нужно много раз перегруппировывать τ или проверять формулы, Calc, Excel или Python заметно удобнее.</p>
+        </div>
+      </details>
+
+      <details class="graph-method">
+        <summary><div><span class="graph-method-badge">способ 4</span><strong>Python · NumPy · Matplotlib</strong><small>воспроизводимый способ: один скрипт для любого файла</small></div><span class="graph-open-label">открыть код</span></summary>
+        <div class="graph-guide-body">
+          <p>Этот вариант особенно полезен, если нужно повторить обработку для нескольких файлов или интервалов τ. Скрипт ниже читает формат лабораторной программы, группирует данные и сохраняет четыре графика.</p>
+          <div class="code-head"><strong>Полный рабочий пример</strong><button class="copy-code" type="button" data-copy-target="pythonGraphsCode">Копировать</button></div>
+          <pre class="guide-code"><code id="pythonGraphsCode">from pathlib import Path
+import numpy as np
+import matplotlib.pyplot as plt
+
+FILE = Path(&quot;experiment.txt&quot;)
+TAU0 = 1.0   # исходный интервал файла, с
+TAU = 1.0    # поставьте 10, 20, 40 или 80 для группировки
+
+# Строки, начинающиеся с #, np.loadtxt пропускает как комментарии
+raw = np.loadtxt(FILE, comments=&quot;#&quot;)
+
+def group_data(data, tau, tau0=1.0):
+    k = tau / tau0
+    if abs(k - round(k)) &gt; 1e-9:
+        raise ValueError(&quot;TAU должен быть целым кратным TAU0&quot;)
+    k = int(round(k))
+    usable = len(data) // k * k
+    return data[:usable].reshape(-1, k).sum(axis=1)
+
+data = group_data(raw, TAU, TAU0)
+N = len(data)
+i = np.arange(1, N + 1)
+t = (i - 1) * TAU
+
+# Накопленные статистики. Дисперсия — с делением на текущее N,
+# как в методичке этой лабораторной.
+sum_n = np.cumsum(data)
+sum_n2 = np.cumsum(data ** 2)
+running_mean = sum_n / i
+running_var = np.maximum(0, sum_n2 / i - running_mean ** 2)
+running_sigma = np.sqrt(running_var)
+running_sem = running_sigma / np.sqrt(i)
+
+# Частоты w_n = N_n / N
+n_values = np.arange(int(data.min()), int(data.max()) + 1)
+counts = np.array([(data == n).sum() for n in n_values])
+frequencies = counts / N
+
+# 1. Отсчёты во времени
+plt.figure(figsize=(10, 4))
+plt.step(t, data, where=&quot;post&quot;)
+plt.xlabel(&quot;t, с&quot;)
+plt.ylabel(&quot;n&quot;)
+plt.title(f&quot;Отсчёты во времени, τ = {TAU:g} с&quot;)
+plt.grid(alpha=0.25)
+plt.tight_layout()
+plt.savefig(&quot;01_time.png&quot;, dpi=180)
+
+# 2. Гистограмма w_n
+plt.figure(figsize=(8, 4))
+plt.bar(n_values, frequencies, width=0.9)
+plt.xlabel(&quot;n&quot;)
+plt.ylabel(&quot;w_n&quot;)
+plt.title(f&quot;Гистограмма, τ = {TAU:g} с, N = {N}&quot;)
+plt.grid(axis=&quot;y&quot;, alpha=0.25)
+plt.tight_layout()
+plt.savefig(&quot;02_histogram.png&quot;, dpi=180)
+
+# 3. Среднее при росте N
+plt.figure(figsize=(9, 4))
+plt.plot(i, running_mean)
+plt.xlabel(&quot;N&quot;)
+plt.ylabel(&quot;&lt;n&gt;&quot;)
+plt.title(&quot;Накопленное среднее&quot;)
+plt.grid(alpha=0.25)
+plt.tight_layout()
+plt.savefig(&quot;03_running_mean.png&quot;, dpi=180)
+
+# 4. Погрешность среднего в log-log координатах
+mask = (i &gt;= 2) &amp; (running_sem &gt; 0)
+plt.figure(figsize=(9, 4))
+plt.loglog(i[mask], running_sem[mask])
+plt.xlabel(&quot;N&quot;)
+plt.ylabel(&quot;sigma_&lt;n&gt;&quot;)
+plt.title(&quot;Погрешность среднего: log-log&quot;)
+plt.grid(which=&quot;both&quot;, alpha=0.25)
+plt.tight_layout()
+plt.savefig(&quot;04_sem_loglog.png&quot;, dpi=180)
+
+plt.show()
+</code></pre>
+
+          <h3>Разберите код, а не просто запускайте</h3>
+          <ol class="guide-steps">
+            <li><code>np.loadtxt(..., comments="#")</code> берёт числовые строки и пропускает комментарии.</li>
+            <li><code>group_data</code> складывает именно неперекрывающиеся соседние интервалы.</li>
+            <li>Накопленное среднее получается из кумулятивной суммы.</li>
+            <li>Дисперсия вычисляется как ⟨n²⟩−⟨n⟩², поэтому соответствует нормировке 1/N из методички.</li>
+            <li>Гистограмма нормируется на N и показывает wₙ, а не абсолютное количество столбцов.</li>
+            <li>Для log-log графика исключаются нулевые значения ошибки: логарифм нуля не определён.</li>
+          </ol>
+          <div class="code-head"><strong>Быстро сравнить несколько τ</strong><button class="copy-code" type="button" data-copy-target="pythonTauCode">Копировать</button></div>
+          <pre class="guide-code short-code"><code id="pythonTauCode">for tau in [1, 10, 20, 40, 80]:
+    d = group_data(raw, tau, TAU0)
+    N = len(d)
+    mean = d.mean()
+    variance = (d**2).mean() - mean**2   # деление на N
+    sigma = np.sqrt(max(0, variance))
+    sem = sigma / np.sqrt(N)
+    j = mean / tau
+    sigma_j = sem / tau
+    print(
+        f&quot;tau={tau:&gt;3} c | N={N:&gt;4} | &quot;
+        f&quot;&lt;n&gt;={mean:8.3f} | sigma={sigma:7.3f} | &quot;
+        f&quot;sigma_&lt;n&gt;={sem:7.4f} | j={j:7.4f} | sigma_j={sigma_j:7.4f}&quot;
+    )
+</code></pre>
+        </div>
+      </details>
+
+      <details class="graph-method">
+        <summary><div><span class="graph-method-badge">способ 5</span><strong>Google Таблицы</strong><small>если нужно работать с любого компьютера</small></div><span class="graph-open-label">открыть инструкцию</span></summary>
+        <div class="graph-guide-body">
+          <p>Логика почти совпадает с Excel: импортируйте числа в столбец, создайте столбцы N, t, накопленного среднего, n², σₙ и σ⟨n⟩. Для частот удобно использовать <code>COUNTIF</code>.</p>
+          <div class="formula-box"><code>=COUNTIF($C$2:$C$4001, J2) / COUNT($C$2:$C$4001)</code></div>
+          <p>Для временного графика и среднего выбирайте точечную диаграмму; для wₙ — столбчатую. Для log-log можно либо создать столбцы LOG10, либо, если доступно в текущем интерфейсе, включить логарифмический масштаб обеих осей.</p>
+          <p>Плюс способа — ничего не нужно устанавливать. Минус — 4000 строк и несколько серий τ быстро делают лист громоздким, поэтому аккуратно подписывайте диапазоны.</p>
+        </div>
+      </details>
+    </div>
+
+    <details class="graph-finish-check">
+      <summary><div><span class="graph-step-number">✓</span><strong>Проверка перед вставкой в отчёт</strong></div><span>короткий чек-лист</span></summary>
+      <div class="graph-guide-body">
+        <div class="report-check-grid">
+          <label><input type="checkbox"> оси подписаны величинами;</label>
+          <label><input type="checkbox"> указаны единицы там, где они есть;</label>
+          <label><input type="checkbox"> в подписи указан τ;</label>
+          <label><input type="checkbox"> гистограмма показывает именно wₙ;</label>
+          <label><input type="checkbox"> все точки рассчитаны из одной серии;</label>
+          <label><input type="checkbox"> log-log не содержит log(0);</label>
+          <label><input type="checkbox"> масштабы позволяют честно сравнивать τ;</label>
+          <label><input type="checkbox"> вы можете объяснить происхождение каждой оси.</label>
+        </div>
+        <div class="final-self-test"><b>Главный тест:</b> если преподаватель укажет на произвольную точку или столбик, вы должны уметь объяснить, какие числа из исходного файла превратились именно в него.</div>
+      </div>
+    </details>
+  </section>
+
+
 <section class="source-rule">
     <strong>Основа страницы</strong>
     <p>Содержание следует методичке лабораторной 1.1.4, версия от 21.06.2024. Учебная программа — примерная браузерная версия, а не точная копия исходного приложения, но она отображает нужные режимы, величины и основные графики работы.</p>
   </section>
 </main>
 
-<footer class="footer"><a href="../">← Каталог лабораторных</a><span>1.1.4 · редакция 0.13</span></footer>
-<script src="app.js?v=0.13"></script>
+<footer class="footer"><a href="../">← Каталог лабораторных</a><span>1.1.4 · редакция 0.14</span></footer>
+<script src="app.js?v=0.14"></script>
 </body>
 </html>
