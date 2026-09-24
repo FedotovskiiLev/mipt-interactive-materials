@@ -1,58 +1,152 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Интерактивные учебные материалы по курсам МФТИ: физика, математика, лабораторные работы и учебная библиотека.">
-  <title>Интерактивные материалы МФТИ — независимый учебный проект</title>
-  <link rel="stylesheet" href="assets/site.css?v=0.17">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Интерактивные учебные материалы для разных предметов и курсов: разборы, модели, задачи и инструменты для учёбы.">
+<title>Интерактивные учебные материалы — независимый проект</title>
+<link rel="stylesheet" href="assets/site.css?v=0.18">
+<link rel="stylesheet" href="assets/editorial.css?v=0.19">
+<script src="assets/catalog.js?v=0.18" defer>
+</script>
 </head>
 <body>
+<a class="skip-link" href="#main">К содержанию</a>
 <header class="site-header">
-  <nav class="site-nav" aria-label="Основная навигация">
-    <a class="brand" href="./">Интерактивные материалы МФТИ</a>
-    <div class="nav-links"><a href="physics/">Физика</a><a href="analytic-geometry/">Ангем</a><a href="bookshelf/">Библиотека</a><a href="about/">О проекте</a></div>
-  </nav>
+<nav class="site-nav" aria-label="Основная навигация">
+<a class="brand" href="./">Интерактивные<br>учебные материалы</a>
+<div class="nav-links">
+<a href="#materials">Материалы</a>
+<a href="bookshelf/">Библиотека</a>
+<a href="about/">О проекте</a>
+</div>
+</nav>
 </header>
-<main class="page">
-  <section class="hero">
-    <div>
-      <div class="kicker">Интерактивные учебные материалы</div>
-      <h1>Понять,<br>увидев в действии.</h1>
-      <p class="lead">Небольшие интерактивные инструменты для университетской математики, физики, лабораторных работ и обработки данных — полностью на статическом сайте.</p>
-    </div>
-    <div class="hero-note independent-hero-note">
-      <span class="independent-badge">Независимый проект</span>
-      <p>Сайт не является официальным ресурсом МФТИ, не создан и не поддерживается МФТИ. Название используется только для обозначения учебного контекста.</p>
-      <a href="https://fedotovskiilev.github.io/" target="_blank" rel="noopener">Сайт автора →</a>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-head"><div><div class="kicker">Разделы</div><h2>Что уже есть</h2></div><p>Каждая тема остаётся самостоятельной и лёгкой, но использует общую навигацию и оформление.</p></div>
-    <div class="grid">
-      <a class="card wide" href="physics/"><span class="tag">Физика</span><h3>Физика и лабораторные работы</h3><p>Теория, интерактивные модели, обработка экспериментальных данных и материалы к лабораторному практикуму.</p><span class="arrow">Открыть физику →</span></a>
-      <a class="card small" href="analytic-geometry/"><span class="tag">Математика</span><h3>Аналитическая геометрия</h3><p>Первая неделя: матрицы, определители, правило Крамера, интерактивные примеры и разбор домашней задачи.</p><span class="arrow">Открыть ангем →</span></a>
-      <a class="card small" href="bookshelf/"><span class="tag">Библиотека</span><h3>Книжная полка</h3><p>Личная полка поверх публичной библиотеки Яндекс Диска: каталог нужен для поиска, а выбранные книги остаются под рукой.</p><span class="arrow">Открыть библиотеку →</span></a>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-head"><div><div class="kicker">В планах</div><h2>Следующие учебные разделы</h2></div><p>Новые материалы можно добавлять постепенно, не меняя общую архитектуру проекта.</p></div>
-    <div class="grid">
-      <article class="card small empty-card"><span class="tag">Математика</span><h3>Математический анализ</h3><p>Пределы, производные, интегралы, ряды и наглядный смысл основных понятий.</p></article>
-      <article class="card small empty-card"><span class="tag">Математика</span><h3>Линейная алгебра</h3><p>Векторные пространства, линейные отображения, собственные значения и следующие темы курса.</p></article>
-      <article class="card small empty-card"><span class="tag">Физика</span><h3>Новые лабораторные</h3><p>Раздел будет расширяться по мере подготовки материалов к следующим работам практикума.</p></article>
-    </div>
-  </section>
+<main class="page" id="main">
+<section class="home-hero" aria-labelledby="home-title">
+  <div class="home-topline"><span>Открытый учебный проект</span><span class="unofficial-stamp">Неофициально</span></div>
+  <h1 id="home-title">Интерактивные<br>учебные материалы<span class="title-dot">.</span></h1>
+  <div class="home-intro-row">
+    <p class="lead">Разборы, модели и задачи, в которых можно менять условия и смотреть, что получится. Для учёбы, лабы или когда просто хочется разобраться.</p>
+    <a class="hero-link" href="#materials">К материалам <span aria-hidden="true">↗</span></a>
+  </div>
+  <div class="home-bottomline"><p>Разные предметы. Разные курсы.</p><span aria-hidden="true">[ x ] &nbsp; { } &nbsp; H₂O</span></div>
+</section>
+<section id="materials" aria-labelledby="catalog-title">
+<div class="catalog-heading">
+<h2 id="catalog-title">Уже можно открыть</h2>
+<span id="catalog-count" role="status">2 материала</span>
+</div>
+<div class="catalog-tools-home" hidden>
+<div class="filters" role="group" aria-label="Предмет">
+<button type="button" data-filter="all" aria-pressed="true">Все темы</button>
+<button type="button" data-filter="math" aria-pressed="false">Математика</button>
+<button type="button" data-filter="physics" aria-pressed="false">Физика</button>
+</div>
+<label class="search-label" for="material-search">
+<span aria-hidden="true">⌕</span>
+<span class="sr-only">Поиск по темам</span>
+<input id="material-search" type="search" placeholder="Найти тему…" autocomplete="off">
+</label>
+</div>
+<div class="material-grid">
+<a class="material-card" href="analytic-geometry/week-1/" data-subject="math" data-material="математика ангем аналитическая геометрия линейная алгебра крамер системы уравнений">
+<div class="material-art math">
+<svg viewBox="0 0 520 160" role="img" aria-label="Произведение двух матриц">
+<g fill="none" stroke="#7b98be" stroke-width="1.5">
+<path d="M62 36H52V124H62M139 36H149V124H139M220 36H210V124H220M297 36H307V124H297M378 36H368V124H378M455 36H465V124H455"/>
+</g>
+<g fill="#244e82" font-family="Georgia,serif" font-size="25" text-anchor="middle">
+<text x="79" y="69">1</text>
+<text x="123" y="69">2</text>
+<text x="79" y="109">0</text>
+<text x="123" y="109">1</text>
+<text x="180" y="88">×</text>
+<text x="237" y="69">2</text>
+<text x="281" y="69">0</text>
+<text x="237" y="109">1</text>
+<text x="281" y="109">3</text>
+<text x="338" y="88">=</text>
+<text x="395" y="69" fill="#2463b5">4</text>
+<text x="439" y="69">6</text>
+<text x="395" y="109">1</text>
+<text x="439" y="109">3</text>
+</g>
+</svg>
+</div>
+<div class="material-body">
+<div class="material-meta">
+<span>Аналитическая геометрия</span>
+<span>Неделя 01</span>
+</div>
+<h3>Матрицы, определители<br>и правило Крамера</h3>
+<p>От индексов матрицы до решения системы. Изменяйте элементы, следите за вычислениями и проверьте себя в задачах.</p>
+<div class="material-bottom">
+<span>6 тем · примеры · самопроверка</span>
+<b>К занятию ↗</b>
+</div>
+</div>
+</a>
+<a class="material-card" href="physics/labs/1.1.4/" data-subject="physics" data-material="физика лабораторная лаба пуассон гаусс погрешность гистограмма данные">
+<div class="material-art physics">
+<svg viewBox="0 0 520 160" role="img" aria-label="Схема распределения числа зарегистрированных частиц">
+<path d="M60 133H465M60 20V133" fill="none" stroke="#9db6d5"/>
+<rect x="84" y="126.26" width="20" height="5.739999999999999" fill="#81a9de" opacity=".7"/>
+<rect x="111" y="117.24" width="20" height="14.76" fill="#81a9de" opacity=".7"/>
+<rect x="138" y="99.2" width="20" height="32.8" fill="#81a9de" opacity=".7"/>
+<rect x="165" y="75.42" width="20" height="56.58" fill="#81a9de" opacity=".7"/>
+<rect x="192" y="50.82000000000001" width="20" height="81.17999999999999" fill="#81a9de" opacity=".7"/>
+<rect x="219" y="37.7" width="20" height="94.3" fill="#2463b5" opacity="1"/>
+<rect x="246" y="40.980000000000004" width="20" height="91.02" fill="#81a9de" opacity=".7"/>
+<rect x="273" y="55.74000000000001" width="20" height="76.25999999999999" fill="#81a9de" opacity=".7"/>
+<rect x="300" y="78.7" width="20" height="53.3" fill="#81a9de" opacity=".7"/>
+<rect x="327" y="97.56" width="20" height="34.44" fill="#81a9de" opacity=".7"/>
+<rect x="354" y="112.32" width="20" height="19.68" fill="#81a9de" opacity=".7"/>
+<rect x="381" y="122.16" width="20" height="9.84" fill="#81a9de" opacity=".7"/>
+<rect x="408" y="127.9" width="20" height="4.1" fill="#81a9de" opacity=".7"/>
+<path d="M77 129C130 127 156 72 208 42S288 64 315 87S374 127 434 131" fill="none" stroke="#225b9f" stroke-width="1.8"/>
+<text x="424" y="32" fill="#225b9f" font-family="Georgia,serif" font-style="italic" font-size="22">P(n)</text>
+</svg>
+</div>
+<div class="material-body">
+<div class="material-meta">
+<span>Физический практикум</span>
+<span>Работа 1.1.4</span>
+</div>
+<h3>Статистика<br>космического фона</h3>
+<p>Почему число частиц меняется от измерения к измерению? Распределение Пуассона, погрешности и разбор вашей серии данных.</p>
+<div class="material-bottom">
+<span>Теория · модель · обработка данных</span>
+<b>К работе ↗</b>
+</div>
+</div>
+</a>
+</div>
+<div class="empty-result" id="catalog-empty" hidden>
+<p>Такой темы пока нет. Попробуйте «матрицы» или «Пуассон».</p>
+<button id="reset-search" type="button">Показать все темы</button>
+</div>
+</section>
+<aside class="library-strip">
+<span class="library-icon" aria-hidden="true">▥</span>
+<div>
+<h3>Своя книжная полка</h3>
+<p>Подключите публичную папку Яндекс Диска и соберите учебники в одном месте.</p>
+</div>
+<a href="bookshelf/">Открыть библиотеку ↗</a>
+</aside>
+<section class="home-colophon">
+  <div><div class="kicker">Проект растёт</div><h2>Без рамок одного курса</h2><p>Сейчас здесь матрицы и лабораторная по физике. Дальше — химия, программирование и другие предметы. Материалы собираются по темам, а не вокруг одного года обучения.</p></div>
+  <div><div class="kicker">Можно поправить</div><h2>Нашли ошибку?</h2><p>Весь код открыт. Если что-то не сходится или хочется добавить свою тему, <a href="https://github.com/FedotovskiiLev/mipt-interactive-materials/issues">напишите в GitHub</a>. Источники и условия использования — на страницах материалов.</p></div>
+</section>
 </main>
 <footer class="footer">
-  <span>Статический сайт · HTML · CSS · JavaScript</span>
-  <span class="footer-links">
-    <a href="about/">О проекте и лицензии</a>
-    <a href="DISCLAIMER.md">Отказ от гарантий</a>
-    <a href="https://fedotovskiilev.github.io/" target="_blank" rel="noopener">Сайт автора</a>
-  </span>
+<span>Независимый учебный проект. Не официальный ресурс МФТИ.</span>
+<span class="footer-links">
+<a href="about/">О проекте</a>
+<a href="https://github.com/FedotovskiiLev/mipt-interactive-materials">Исходный код ↗</a>
+<a href="https://fedotovskiilev.github.io/">Автор ↗</a>
+</span>
 </footer>
 </body>
 </html>

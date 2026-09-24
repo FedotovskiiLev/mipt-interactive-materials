@@ -58,7 +58,7 @@ function det2(v){return v[0]*v[3]-v[1]*v[2]}
 function det3(v){return v[0]*(v[4]*v[8]-v[5]*v[7])-v[1]*(v[3]*v[8]-v[5]*v[6])+v[2]*(v[3]*v[7]-v[4]*v[6])}
 function renderDetInputs(values=detDefaults[detSize]){
   const host=$('detInputs');host.innerHTML=`<div class="det-grid size${detSize}" id="detGrid"></div>`;const grid=$('detGrid');
-  values.forEach(v=>{const inp=document.createElement('input');inp.value=v;inp.inputMode='numeric';inp.addEventListener('input',updateDet);grid.append(inp)});updateDet();
+  values.forEach((v,k)=>{const inp=document.createElement('input');inp.setAttribute('aria-label',`Элемент a${Math.floor(k/detSize)+1}${k%detSize+1}`);inp.value=v;inp.inputMode='numeric';inp.addEventListener('input',updateDet);grid.append(inp)});updateDet();
 }
 function updateDet(){
   const v=$$('#detGrid input').map(x=>num(x.value));
@@ -77,10 +77,10 @@ function renderCramerSystem(){
   for(let r=0;r<cramerSize;r++){
     const row=document.createElement('div');row.className='eq-row';
     for(let c=0;c<cramerSize;c++){
-      const inp=document.createElement('input');inp.value=d.A[r][c];inp.dataset.kind='a';inp.dataset.r=r;inp.dataset.c=c;row.append(inp);
+      const inp=document.createElement('input');inp.value=d.A[r][c];inp.dataset.kind='a';inp.dataset.r=r;inp.dataset.c=c;inp.setAttribute('aria-label',`Коэффициент a${r+1}${c+1}`);inp.addEventListener('input',()=>{$('cramerOutput').textContent='Коэффициенты изменены. Пересчитайте определители.'});row.append(inp);
       const s=document.createElement('span');s.textContent=c===cramerSize-1?`x${c+1}`:`x${c+1} +`;row.append(s)
     }
-    const eq=document.createElement('span');eq.textContent='=';row.append(eq);const rhs=document.createElement('input');rhs.value=d.b[r];rhs.dataset.kind='b';rhs.dataset.r=r;row.append(rhs);host.append(row)
+    const eq=document.createElement('span');eq.textContent='=';row.append(eq);const rhs=document.createElement('input');rhs.value=d.b[r];rhs.dataset.kind='b';rhs.dataset.r=r;rhs.setAttribute('aria-label',`Правая часть b${r+1}`);rhs.addEventListener('input',()=>{$('cramerOutput').textContent='Правая часть изменена. Пересчитайте определители.'});row.append(rhs);host.append(row)
   }
   $('cramerOutput').innerHTML='<p>Сначала попробуй определить, какой столбец надо заменить для Δ₁.</p>'
 }
@@ -102,7 +102,7 @@ $$('[data-hint]').forEach(btn=>btn.addEventListener('click',()=>{const el=docume
 
 // ---------- checklist ----------
 const AUDIT_KEY='angem.week1.audit';let saved={};try{saved=JSON.parse(localStorage.getItem(AUDIT_KEY)||'{}')}catch(_){}
-$$('[data-audit]').forEach(box=>{box.checked=!!saved[box.dataset.audit];box.addEventListener('change',()=>{const s={};$$('[data-audit]').forEach(x=>s[x.dataset.audit]=x.checked);localStorage.setItem(AUDIT_KEY,JSON.stringify(s))})});
+$$('[data-audit]').forEach(box=>{box.checked=!!saved[box.dataset.audit];box.addEventListener('change',()=>{const s={};$$('[data-audit]').forEach(x=>s[x.dataset.audit]=x.checked);try{localStorage.setItem(AUDIT_KEY,JSON.stringify(s))}catch(_){}})});
 
 // ---------- quiz ----------
 const quiz=[

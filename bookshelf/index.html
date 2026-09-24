@@ -7,25 +7,27 @@
   <title>Библиотека — Интерактивные материалы МФТИ</title>
   <link rel="stylesheet" href="../assets/site.css?v=0.17">
   <link rel="stylesheet" href="bookshelf.css?v=0.9">
+  <link rel="stylesheet" href="../assets/editorial.css?v=0.19">
 </head>
 <body>
+<a class="skip-link" href="#main">К содержанию</a>
 <header class="site-header">
   <nav class="site-nav" aria-label="Основная навигация">
-    <a class="brand" href="../">Интерактивные материалы МФТИ</a>
+    <a class="brand" href="../">Интерактивные<br>учебные материалы</a>
     <div class="nav-links">
       <a href="../physics/">Физика</a>
-      <a href="../analytic-geometry/">Ангем</a>
+      <a href="../analytic-geometry/">Геометрия</a>
       <a aria-current="page" href="./">Библиотека</a>
       <a href="../about/">О проекте</a>
     </div>
   </nav>
 </header>
 
-<main class="books-page">
+<main class="books-page" id="main">
   <section class="books-intro">
     <div class="kicker">Личная учебная библиотека</div>
     <h1>Книжная полка</h1>
-    <p>На главной — только книги, которыми вы реально пользуетесь. Весь Яндекс Диск спрятан в каталоге и нужен только для добавления новых книг.</p>
+    <p>Добавьте учебники из публичной папки Яндекс Диска. Выбранные книги останутся на полке в этом браузере.</p>
   </section>
 
   <section class="setup" id="setup">
@@ -67,6 +69,7 @@
     </div>
   </section>
 </main>
+<footer class="footer"><span>Независимый учебный проект. Не официальный ресурс МФТИ.</span><span class="footer-links"><a href="../about/">О проекте</a><a href="https://github.com/FedotovskiiLev/mipt-interactive-materials">Исходный код ↗</a><a href="https://fedotovskiilev.github.io/">Автор ↗</a></span></footer>
 
 <dialog id="catalogDialog" class="catalog-dialog">
   <div class="catalog-dialog-shell">
@@ -77,7 +80,7 @@
           <h2 id="catalogSectionTitle">—</h2>
           <button class="section-switch" id="chooseSectionBtn" type="button">Сменить раздел</button>
         </div>
-        <p>Каталог показывает только выбранный крупный раздел источника, чтобы остальные разделы не перегружали интерфейс.</p>
+        <p>Поиск работает внутри выбранного раздела. Чтобы искать в другой папке, смените раздел.</p>
       </div>
       <button class="dialog-close" id="closeCatalog" type="button" aria-label="Закрыть">×</button>
     </header>

@@ -6,11 +6,13 @@
   <meta name="description" content="Интерактивный учебный материал к лабораторной работе 1.1.4: статистические закономерности на примере фона космического излучения.">
   <title>1.1.4 — Статистика космического фона</title>
   <link rel="stylesheet" href="styles.css?v=0.14">
+  <link rel="stylesheet" href="../../../assets/editorial.css?v=0.19">
 </head>
 <body>
+<a class="skip-link" href="#main">К содержанию</a>
 <header class="topbar">
   <div class="topbar-inner">
-    <a class="brand" href="../../../">Интерактивные материалы МФТИ</a>
+    <a class="brand" href="../../../">Интерактивные<br>учебные материалы</a>
     <nav class="topnav" aria-label="Навигация по работе">
       <a href="#theory">Теория с нуля</a>
       <a href="#measure">Измерение</a>
@@ -24,25 +26,26 @@
   </div>
 </header>
 
-<main>
+<main id="main">
   <section class="hero">
     <div class="hero-main">
       <div class="eyebrow">Физика · лабораторная 1.1.4</div>
       <h1>Статистика космического фона</h1>
-      <p class="hero-lead">Не набор формул, а маршрут по работе: что именно считает установка, откуда берутся среднее и разброс, как появляется гистограмма, почему здесь нужен закон Пуассона и что меняется при группировке измерений.</p>
+      <p class="hero-lead">Счётчик регистрирует частицы, а число событий в каждом интервале оказывается разным. Разберём этот разброс, сравним данные с распределением Пуассона и оценим погрешность среднего.</p>
       <div class="hero-actions">
         <a class="button primary" href="#measure">Начать с измерения</a>
-        <a class="button" href="#theory">Мне нужна теория с нуля</a>
-        <a class="button" href="#analyzer">У меня уже есть данные</a>
+        <a class="button" href="#theory">Разобрать теорию</a>
+        <a class="button" href="#analyzer">Обработать данные</a>
       </div>
     </div>
     <aside class="hero-principle">
-      <div class="principle-title">Понять, увидев в действии</div>
-      <p>Каждое определение ниже связано с небольшим интерактивом. Сначала меняем величины и смотрим, что происходит, затем читаем формулу.</p>
+      <div class="principle-title">Перед лабораторной</div>
+      <p>Начните с модели измерения. Если серия уже записана, перейдите к обработке: загрузите файл, выберите интервал группировки и сравните распределения.</p>
       <div class="source-badge">Методичка 1.1.4 · версия от 21.06.2024</div>
     </aside>
   </section>
 
+  <div class="reading-meta"><a href="../">← Лабораторные работы</a><span>Работа 1.1.4</span><span>Свои данные обрабатываются в браузере</span></div>
   <section class="route route-nine" aria-label="Маршрут по работе">
     <a href="#theory"><b>0</b><span>Теория с нуля</span></a>
     <a href="#measure"><b>1</b><span>Что измеряется</span></a>
@@ -67,13 +70,13 @@
 
 <section id="theory" class="lesson-section theory-section">
     <div class="section-heading">
-      <div><div class="eyebrow">00 · теория с нуля</div><h2>Вся теория, которая нужна для этой работы</h2></div>
-      <p>Раздел специально свёрнут по темам. Его можно пройти с самого начала или открывать только незнакомые понятия. Здесь раскрываются только обозначения, формулы и идеи из предоставленной методички 1.1.4.</p>
+      <div><div class="eyebrow">00 · теория с нуля</div><h2>Выборка, разброс и распределения</h2></div>
+      <p>Открывайте темы по порядку или выберите нужное определение. Обозначения соответствуют методичке 1.1.4.</p>
     </div>
 
     <div class="theory-toolbar">
       <div>
-        <strong>Если статистика почти новая</strong>
+        <strong>Порядок тем</strong>
         <span>Идите сверху вниз: выборка → среднее → дисперсия → ошибка → гистограмма → Пуассон → Гаусс → группировка.</span>
       </div>
       <div class="theory-toolbar-actions">
@@ -308,7 +311,7 @@
 
 <section id="measure" class="lesson-section">
     <div class="section-heading">
-      <div><div class="eyebrow">01 · измерение</div><h2>Что на самом деле записывает установка</h2></div>
+      <div><div class="eyebrow">01 · измерение</div><h2>Что регистрирует счётчик</h2></div>
       <p>Счётчик Гейгера–Мюллера регистрирует отдельные импульсы. Программа считает, сколько импульсов попало в каждый интервал времени.</p>
     </div>
 
@@ -344,7 +347,7 @@
 
   <section id="statistics" class="lesson-section">
     <div class="section-heading">
-      <div><div class="eyebrow">02 · серия измерений</div><h2>Среднее, разброс и ошибка — это разные вещи</h2></div>
+      <div><div class="eyebrow">02 · серия измерений</div><h2>Среднее, разброс и погрешность</h2></div>
       <p>Их легко спутать, если просто выучить три формулы. Здесь можно пройти вычисление по шагам на одной небольшой серии.</p>
     </div>
 
@@ -387,7 +390,7 @@
 
   <section id="histogram" class="lesson-section">
     <div class="section-heading">
-      <div><div class="eyebrow">03 · гистограмма</div><h2>Гистограмма отвечает: «как часто встречалось каждое n?»</h2></div>
+      <div><div class="eyebrow">03 · гистограмма</div><h2>Частоты и гистограмма</h2></div>
       <p>Она строится не из среднего и не из σ. Для каждого значения n отдельно считаем, сколько раз оно встретилось.</p>
     </div>
 
@@ -414,7 +417,7 @@
 
   <section id="poisson" class="lesson-section accent-section">
     <div class="section-heading">
-      <div><div class="eyebrow">04 · закон Пуассона</div><h2>Теперь вместо «что получилось» спрашиваем «что ожидается»</h2></div>
+      <div><div class="eyebrow">04 · закон Пуассона</div><h2>Распределение Пуассона</h2></div>
       <p>Для среднего числа событий n̄ методичка задаёт вероятность получить ровно n регистраций законом Пуассона.</p>
     </div>
 
@@ -472,7 +475,7 @@
 
   <section id="error" class="lesson-section">
     <div class="section-heading">
-      <div><div class="eyebrow">06 · погрешность</div><h2>Главное число — сколько событий вы вообще зарегистрировали</h2></div>
+      <div><div class="eyebrow">06 · погрешность</div><h2>Погрешность и число событий</h2></div>
       <p>Для пуассоновского процесса формулы методички сводят относительную ошибку среднего к общему числу зарегистрированных частиц nΣ.</p>
     </div>
 
@@ -546,16 +549,16 @@
 
   <section id="analyzer" class="lesson-section analyzer-section">
     <div class="section-heading">
-      <div><div class="eyebrow">08 · ваши данные</div><h2>Теперь применяем всё к файлу эксперимента</h2></div>
+      <div><div class="eyebrow">08 · ваши данные</div><h2>Обработка экспериментальных данных</h2></div>
       <p>Строки с <code>#</code> не входят в числовые расчёты, но сайт читает из них служебные сведения файла. Для дисперсии используется определение методички — с делением на N.</p>
     </div>
 
     <div class="data-loader">
       <div class="loader-left">
         <label class="file-drop" for="fileInput"><input id="fileInput" type="file" accept=".txt,.dat,.csv,text/plain"><strong>Выбрать файл</strong><span>или перетащить/вставить данные ниже</span></label>
-        <textarea id="dataText" spellcheck="false" placeholder="# комментарий&#10;4&#10;3&#10;6&#10;..."></textarea>
+        <label class="sr-only" for="dataText">Исходные отсчёты: числа через пробел или с новой строки</label><textarea id="dataText" spellcheck="false" placeholder="# комментарий&#10;4&#10;3&#10;6&#10;..."></textarea>
         <div class="loader-actions"><button class="button primary" id="analyzeBtn" type="button">Разобрать данные</button><button class="button" id="sampleBtn" type="button">Учебный пример</button></div>
-        <div class="data-status" id="dataStatus">Данные ещё не загружены.</div>
+        <div class="data-status" id="dataStatus" role="status">Данные ещё не загружены.</div>
       </div>
       <div class="loader-right">
         <label>Базовый интервал τ₀, с<input id="baseTau" type="number" min="0.001" step="any" value="1"></label>
@@ -573,7 +576,7 @@
   
   <section id="program" class="lesson-section program-section">
     <div class="section-heading">
-      <div><div class="eyebrow">09 · учебная версия программы</div><h2>Те же четыре представления данных — прямо в браузере</h2></div>
+      <div><div class="eyebrow">09 · учебная версия программы</div><h2>Модель измерения и симуляция</h2></div>
       <p>После лабораторной работы исходная программа может быть недоступна, поэтому здесь есть её учебный браузерный аналог. Эксперимент и симуляция разделены как два источника данных; после получения серии работают одни и те же четыре графика.</p>
     </div>
 
@@ -710,12 +713,12 @@
     <div class="program-boundaries program-boundaries-final">
       <article>
         <div class="method-label">Эксперимент и симуляция</div>
-        <h3>Разный источник — одинаковый формат результата</h3>
+        <h3>Формат данных</h3>
         <p>Эксперимент получает nᵢ от установки. Симуляция получает nᵢ от ГПСЧ. Дальше обе серии можно читать, группировать и обрабатывать одинаковыми статистическими методами.</p>
       </article>
       <article>
         <div class="method-label warm-label">О веб-версии</div>
-        <h3>Примерная программа, а не точная копия</h3>
+        <h3>Ограничения модели</h3>
         <p>Интерфейс сделан заново для браузера, но сохраняет то, что нужно для лабораторной: эксперимент и симуляцию, поток отсчётов, текущие статистики и четыре основных графика.</p>
       </article>
     </div>
@@ -733,7 +736,7 @@
 
   <section id="check" class="lesson-section check-section">
     <div class="section-heading">
-      <div><div class="eyebrow">10 · самопроверка</div><h2>Тренажёр вопросов по всей работе</h2></div>
+      <div><div class="eyebrow">10 · самопроверка</div><h2>Самопроверка</h2></div>
       <p>В банке больше вопросов, чем нужно за один проход. Можно пройти десять случайных или полный набор. После каждого ответа показывается объяснение из теории страницы.</p>
     </div>
 
@@ -758,14 +761,14 @@
 
   <section id="build-graphs" class="lesson-section build-graphs-section">
     <div class="section-heading">
-      <div><div class="eyebrow">11 · теперь построй сам</div><h2>Четыре графика без кнопки «построить»</h2></div>
+      <div><div class="eyebrow">11 · теперь построй сам</div><h2>Постройте графики самостоятельно</h2></div>
       <p>Автоматическая обработка полезна для проверки, но студент должен уметь получить те же графики из сырого файла самостоятельно. Ниже — несколько полноценных способов, от таблиц до Python.</p>
     </div>
 
     <div class="self-build-intro">
       <article class="self-build-goal">
         <div class="method-label">Задача</div>
-        <h3>Воспроизведите те же четыре окна</h3>
+        <h3>Что должно получиться</h3>
         <p>Возьмите файл эксперимента или файл симуляции и постройте: отсчёты во времени, гистограмму частот, накопленное среднее и погрешность среднего в log-log координатах.</p>
       </article>
       <div class="self-build-checklist">
@@ -958,7 +961,7 @@ plt.savefig(&quot;04_sem_loglog.png&quot;, dpi=180)
 plt.show()
 </code></pre>
 
-          <h3>Разберите код, а не просто запускайте</h3>
+          <h3>Как устроен расчёт</h3>
           <ol class="guide-steps">
             <li><code>np.loadtxt(..., comments="#")</code> берёт числовые строки и пропускает комментарии.</li>
             <li><code>group_data</code> складывает именно неперекрывающиеся соседние интервалы.</li>
@@ -1022,7 +1025,7 @@ plt.show()
   </section>
 </main>
 
-<footer class="footer"><a href="../">← Каталог лабораторных</a><span>1.1.4 · редакция 0.14</span></footer>
-<script src="app.js?v=0.14"></script>
+<footer class="footer"><span>Независимый учебный проект. Не официальный ресурс МФТИ.</span><span class="footer-links"><a href="../../../about/">О проекте</a><a href="https://github.com/FedotovskiiLev/mipt-interactive-materials">Исходный код ↗</a><a href="https://fedotovskiilev.github.io/">Автор ↗</a></span></footer>
+<script src="app.js?v=0.18"></script>
 </body>
 </html>
