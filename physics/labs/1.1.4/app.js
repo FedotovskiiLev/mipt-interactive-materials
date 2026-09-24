@@ -5,7 +5,7 @@
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const COLORS = {
     ink: '#17202a', muted: '#66727e', grid: '#dfe5eb', data: '#315f9a', data2: '#6f8fb2',
-    poisson: '#1f7a6c', gaussian: '#9a7042', theory: '#8d5f8c', good: '#2f7b60'
+    poisson: '#173f76', gaussian: '#729bcf', theory: '#486d9c', good: '#2463b5'
   };
 
   const HIST_DEMO = [3,5,7,12,4,3,4,3,3,5,3,2,7,6,7,7,8,3,4,0,9,10,4,4,8,6,7,3,8,2,4,3,4,4,6,8,2,4,7,4,4,7,5,6,4,7,6,9,7,4,4,6,3,3,4,7,3,3,4,6,3,6,2,6,5,7,4,7,5,5,2,7,8,8,6,8,5,4,4,4,6,2,9,3,10,5,6,5,4,5,6,7,5,5,6,5,10,4,4,4];

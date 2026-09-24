@@ -7,32 +7,34 @@
   <title>Неделя 1 · Матрицы и Крамер</title>
   <link rel="stylesheet" href="../../assets/site.css?v=0.17">
   <link rel="stylesheet" href="styles.css?v=0.17">
+  <link rel="stylesheet" href="../../assets/editorial.css?v=0.18">
 </head>
 <body>
+<a class="skip-link" href="#main">К содержанию</a>
 <header class="site-header lesson-header">
   <nav class="site-nav lesson-nav" aria-label="Основная навигация">
-    <a class="brand" href="../../">Интерактивные материалы МФТИ</a>
+    <a class="brand" href="../../">Интерактивные<br>материалы МФТИ</a>
     <div class="nav-links">
       <a href="#matrices">Матрица</a>
       <a href="#multiply">Умножение</a>
       <a href="#commute">AB и BA</a>
       <a href="#determinant">det</a>
       <a href="#cramer">Крамер</a>
-      <a href="#homework">Домашка</a>
+      <a href="#homework">Задача</a>
       <a href="#check">Проверка</a>
     </div>
   </nav>
 </header>
 
-<main class="lesson-page">
+<main class="lesson-page" id="main">
   <section class="lesson-hero">
     <div>
       <div class="kicker">Аналитическая геометрия · неделя 1</div>
-      <h1>Матрицы,<br>определители<br>и Крамер.</h1>
-      <p class="lead">Не набор правил, а один маршрут: понять запись матрицы → увидеть «строка × столбец» → разобраться, почему AB обычно не равно BA → научиться считать определитель → применять его к системе.</p>
+      <h1>Матрицы и<br>определители</h1>
+      <p class="lead">Как устроено произведение матриц, почему важен порядок множителей и как определитель помогает решить систему уравнений. На примерах 2×2 и 3×3.</p>
       <div class="hero-actions">
-        <a class="lesson-button primary" href="#matrices">Начать с нуля</a>
-        <a class="lesson-button" href="#homework">Перейти к домашке</a>
+        <a class="lesson-button primary" href="#matrices">Начать занятие</a>
+        <a class="lesson-button" href="#homework">К самостоятельной задаче</a>
       </div>
     </div>
     <aside class="source-note">
@@ -42,6 +44,7 @@
     </aside>
   </section>
 
+  <div class="reading-meta"><a href="../">← Аналитическая геометрия</a><span>Неделя 1 · 6 тем</span><span>Нужны: арифметика и линейные уравнения</span></div>
   <nav class="route" aria-label="Маршрут недели">
     <a href="#matrices"><b>0</b><span>Что такое матрица</span></a>
     <a href="#multiply"><b>1</b><span>Строка × столбец</span></a>
@@ -53,13 +56,13 @@
 
   <section class="lesson-section intro-section">
     <div class="section-heading">
-      <div><div class="eyebrow">Перед началом</div><h2>Что нужно уметь после этой недели</h2></div>
-      <p>Не обязательно помнить всё наизусть. Важно уметь восстановить правило из смысла операции.</p>
+      <div><div class="eyebrow">Перед началом</div><h2>Что разберём</h2></div>
+      <p>Для начала достаточно арифметики и решения линейных уравнений.</p>
     </div>
     <div class="goal-grid">
       <article><b>Читать матрицу</b><span>понимать размер m×n и индекс aᵢⱼ</span></article>
       <article><b>Умножать</b><span>понимать, откуда берётся каждый элемент AB</span></article>
-      <article><b>Не переставлять бездумно</b><span>знать, что AB и BA — разные операции</span></article>
+      <article><b>Сравнивать AB и BA</b><span>знать, что AB и BA — разные операции</span></article>
       <article><b>Считать det</b><span>2×2 и 3×3 без потери знаков</span></article>
       <article><b>Решать по Крамеру</b><span>если det A ≠ 0</span></article>
       <article><b>Проверять себя</b><span>подстановкой и пересчётом ключевых определителей</span></article>
@@ -68,7 +71,7 @@
 
   <section id="matrices" class="lesson-section">
     <div class="section-heading">
-      <div><div class="eyebrow">00 · матричная запись</div><h2>Матрица — таблица, где место элемента имеет смысл</h2></div>
+      <div><div class="eyebrow">00 · матричная запись</div><h2>Размер матрицы и индексы</h2></div>
       <p>В Умнове матричные объекты вводятся уже в §1.1. Здесь сначала разберём саму запись, а потом действия.</p>
     </div>
 
@@ -93,7 +96,7 @@
 
   <section id="multiply" class="lesson-section">
     <div class="section-heading">
-      <div><div class="eyebrow">01 · умножение матриц</div><h2>Каждая клетка результата — строка первой на столбец второй</h2></div>
+      <div><div class="eyebrow">01 · умножение матриц</div><h2>Умножение: строка на столбец</h2></div>
       <p>Это центральная идея §5.1 Умнова. Умножение определено, когда число столбцов первой матрицы равно числу строк второй.</p>
     </div>
 
@@ -188,7 +191,7 @@
         <button class="lesson-button primary" id="solveCramer" type="button">Посчитать Δ и Δᵢ</button>
         <button class="text-button" id="resetCramer" type="button">Вернуть учебный пример</button>
       </div>
-      <div class="cramer-output" id="cramerOutput"><p>Сначала попробуй определить, какой столбец надо заменить для Δ₁.</p></div>
+      <div class="cramer-output" id="cramerOutput" aria-live="polite"><p>Сначала попробуй определить, какой столбец надо заменить для Δ₁.</p></div>
     </div>
 
     <details class="theory-more wide-details">
@@ -198,7 +201,7 @@
         <article><b>2</b><span>Посчитай Δ = det A.</span></article>
         <article><b>3</b><span>Для Δᵢ замени i-й столбец A на b.</span></article>
         <article><b>4</b><span>Если Δ ≠ 0, xᵢ = Δᵢ / Δ.</span></article>
-        <article><b>5</b><span>Подставь найденные значения обратно хотя бы в одно уравнение.</span></article>
+        <article><b>5</b><span>Подставь найденные значения во все уравнения системы.</span></article>
       </div>
     </details>
   </section>
@@ -298,6 +301,6 @@
 </main>
 
 <footer class="lesson-footer"><a href="../">← Все недели</a><span>Неделя 1 · редакция 0.17</span></footer>
-<script src="app.js?v=0.17"></script>
+<script src="app.js?v=0.18"></script>
 </body>
 </html>
