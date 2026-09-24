@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Матрицы, определители и статистика космического фона: разборы, интерактивные модели и обработка данных к занятиям МФТИ.">
-<title>Интерактивные материалы МФТИ — математика и физика</title>
+<meta name="description" content="Интерактивные учебные материалы для разных предметов и курсов: разборы, модели, задачи и инструменты для учёбы.">
+<title>Интерактивные учебные материалы — независимый проект</title>
 <link rel="stylesheet" href="assets/site.css?v=0.18">
-<link rel="stylesheet" href="assets/editorial.css?v=0.18">
+<link rel="stylesheet" href="assets/editorial.css?v=0.19">
 <script src="assets/catalog.js?v=0.18" defer>
 </script>
 </head>
@@ -14,64 +14,27 @@
 <a class="skip-link" href="#main">К содержанию</a>
 <header class="site-header">
 <nav class="site-nav" aria-label="Основная навигация">
-<a class="brand" href="./">Интерактивные<br>материалы МФТИ</a>
+<a class="brand" href="./">Интерактивные<br>учебные материалы</a>
 <div class="nav-links">
-<a href="physics/">Физика</a>
-<a href="analytic-geometry/">Геометрия</a>
+<a href="#materials">Материалы</a>
 <a href="bookshelf/">Библиотека</a>
 <a href="about/">О проекте</a>
 </div>
 </nav>
 </header>
 <main class="page" id="main">
-<section class="home-hero">
-<div>
-<div class="kicker">Математика и физика · первый курс</div>
-<h1>Математика<br>и физика<br>
-<em>в примерах.</em>
-</h1>
-<p class="lead">Материалы к занятиям: короткие объяснения, модели, с которыми можно поэкспериментировать, и задачи для самостоятельного решения.</p>
-<a class="hero-link" href="#materials">Выбрать тему <span aria-hidden="true">↘</span>
-</a>
-</div>
-<div class="figure-board">
-<div class="figure-heading">
-<span>Геометрия преобразования</span>
-<span>Рис. 01</span>
-</div>
-<svg viewBox="0 0 400 300" role="img" aria-label="Линейное преобразование: единичный квадрат переходит в параллелограмм площади 2">
-<defs>
-<pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
-<path d="M28 0H0V28" fill="none" stroke="#c2d4ed" stroke-width=".6"/>
-</pattern>
-<marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-<path d="M0 0L7 3.5 0 7" fill="none" stroke="#214e88"/>
-</marker>
-</defs>
-<rect width="400" height="300" fill="url(#grid)"/>
-<path d="M45 244H368M82 274V25" stroke="#839cbe" fill="none"/>
-<path d="M82 244L222 174L292 69L152 139Z" fill="#a4c5f2" fill-opacity=".65" stroke="#3366a4" stroke-width="1.5"/>
-<path d="M82 244H152V174H82Z" fill="#ffffff" fill-opacity=".65" stroke="#7294bf" stroke-dasharray="5 4"/>
-<path d="M82 244L222 174M82 244L152 139" stroke="#214e88" stroke-width="2" marker-end="url(#arrow)"/>
-<path d="M154 170Q210 140 277 81" fill="none" stroke="#2463b5" stroke-width="1.2" stroke-dasharray="4 4"/>
-<g font-family="Georgia,serif" font-style="italic" fill="#214e88" font-size="18">
-<text x="228" y="188">a</text>
-<text x="136" y="126">b</text>
-<text x="64" y="263">0</text>
-<text x="351" y="265">x</text>
-<text x="64" y="36">y</text>
-</g>
-<text x="268" y="42" fill="#2463b5" font-family="Georgia,serif" font-size="20">det A = 2</text>
-</svg>
-<div class="figure-caption">
-<span>Матрица меняет форму и площадь.</span>
-<span>ℝ² → ℝ²</span>
-</div>
-</div>
+<section class="home-hero" aria-labelledby="home-title">
+  <div class="home-topline"><span>Открытый учебный проект</span><span class="unofficial-stamp">Неофициально</span></div>
+  <h1 id="home-title">Интерактивные<br>учебные материалы<span class="title-dot">.</span></h1>
+  <div class="home-intro-row">
+    <p class="lead">Разборы, модели и задачи, в которых можно менять условия и смотреть, что получится. Для учёбы, лабы или когда просто хочется разобраться.</p>
+    <a class="hero-link" href="#materials">К материалам <span aria-hidden="true">↗</span></a>
+  </div>
+  <div class="home-bottomline"><p>Разные предметы. Разные курсы.</p><span aria-hidden="true">[ x ] &nbsp; { } &nbsp; H₂O</span></div>
 </section>
 <section id="materials" aria-labelledby="catalog-title">
 <div class="catalog-heading">
-<h2 id="catalog-title">За рабочий стол</h2>
+<h2 id="catalog-title">Уже можно открыть</h2>
 <span id="catalog-count" role="status">2 материала</span>
 </div>
 <div class="catalog-tools-home" hidden>
@@ -173,16 +136,8 @@
 <a href="bookshelf/">Открыть библиотеку ↗</a>
 </aside>
 <section class="home-colophon">
-<div>
-<div class="kicker">Как заниматься</div>
-<h2>Сначала попробуйте сами</h2>
-<p>Прочитайте объяснение, измените параметры модели, затем решите задачу без подсказки. К любому разделу можно перейти сразу — порядок выбираете вы.</p>
-</div>
-<div>
-<div class="kicker">Об этих материалах</div>
-<h2>Дополнение к занятиям</h2>
-<p>Разборы опираются на учебники и методички курса. Источники указаны на страницах. Если заметили неточность, <a href="https://github.com/FedotovskiiLev/mipt-interactive-materials/issues">сообщите о ней</a> — лучше с примером или ссылкой на параграф.</p>
-</div>
+  <div><div class="kicker">Проект растёт</div><h2>Без рамок одного курса</h2><p>Сейчас здесь матрицы и лабораторная по физике. Дальше — химия, программирование и другие предметы. Материалы собираются по темам, а не вокруг одного года обучения.</p></div>
+  <div><div class="kicker">Можно поправить</div><h2>Нашли ошибку?</h2><p>Весь код открыт. Если что-то не сходится или хочется добавить свою тему, <a href="https://github.com/FedotovskiiLev/mipt-interactive-materials/issues">напишите в GitHub</a>. Источники и условия использования — на страницах материалов.</p></div>
 </section>
 </main>
 <footer class="footer">
